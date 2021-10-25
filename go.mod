@@ -3,8 +3,11 @@ module github.com/mutagen-io/mutagen-compose
 go 1.17
 
 require (
+	github.com/docker/cli v20.10.7+incompatible
 	github.com/docker/compose/v2 v2.0.1
 	github.com/mutagen-io/mutagen v0.12.0-beta8
+	github.com/spf13/cobra v1.2.1
+	github.com/spf13/pflag v1.0.5
 )
 
 require (
@@ -29,7 +32,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/distribution/v3 v3.0.0-20210316161203-a01c71e2477e // indirect
 	github.com/docker/buildx v0.5.2-0.20210422185057-908a856079fc // indirect
-	github.com/docker/cli v20.10.7+incompatible // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v20.10.7+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4-0.20210125172408-38bea2ce277a // indirect
@@ -37,6 +39,8 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
+	github.com/eknkc/basex v1.0.1 // indirect
+	github.com/fatih/color v1.12.0 // indirect
 	github.com/fvbommel/sortorder v1.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/flock v0.8.0 // indirect
@@ -54,6 +58,7 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/hashicorp/go-version v1.3.0 // indirect
+	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jaguilar/vt100 v0.0.0-20150826170717-2703a27b14ea // indirect
@@ -75,6 +80,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/opencontainers/runc v1.0.1 // indirect
@@ -88,8 +94,6 @@ require (
 	github.com/qri-io/jsonschema v0.1.1 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/spf13/cobra v1.2.1 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/theupdateframework/notary v0.6.1 // indirect
 	github.com/tonistiigi/fsutil v0.0.0-20201103201449-0834f99b7b85 // indirect
 	github.com/tonistiigi/units v0.0.0-20180711220420-6950e57a87ea // indirect
