@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/pflag"
@@ -106,7 +107,7 @@ func main() {
 	if help || len(os.Args) == 1 {
 		if len(commandAndArguments) > 0 {
 			os.Args = []string{"docker", "compose", commandAndArguments[0], "--help"}
-			invokeCompose()
+			invokeCompose(nil)
 		} else {
 			showTopLevelUsage()
 		}
@@ -124,6 +125,20 @@ func main() {
 	// TODO: Override the RunE entrypoint of the Compose version command as well
 	// to provide our own version information.
 
+	// Determine if this command needs a liaison. If not, then we can save the
+	// trouble of establishing a connection to the Mutagen daemon.
+	//
+	// TODO: Do we need the length check on commandAndArguments here? Can we
+	// know enough from the help/version checks above?
+	var liaison *liaison
+	if len(commandAndArguments) > 0 && needsLiaison[commandAndArguments[0]] {
+		if l, err := newLiaison(); err != nil {
+			cmd.Fatal(fmt.Errorf("unable to interface with Mutagen: %w", err))
+		} else {
+			liaison = l
+		}
+	}
+
 	// Compute the emulated arguments that we'll use for the plugin-based
 	// invocation of Compose.
 	emulatedArgs := []string{"docker"}
@@ -134,5 +149,5 @@ func main() {
 	os.Args = emulatedArgs
 
 	// Invoke Compose.
-	invokeCompose()
+	invokeCompose(liaison)
 }

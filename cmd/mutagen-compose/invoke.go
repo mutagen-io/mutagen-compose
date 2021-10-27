@@ -41,7 +41,7 @@ func init() {
 
 // invokeCompose invokes Compose via the plugin infrastructure. It requires that
 // os.Args be set in a manner that emulates execution as a plugin.
-func invokeCompose() {
+func invokeCompose(liaison *liaison) {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
 		lazyInit := api.NewServiceProxy()
 		cmd := commands.RootCommand(lazyInit)
@@ -50,8 +50,7 @@ func invokeCompose() {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
-			// TODO: Wrap this service with a Mutagen interceptor.
-			lazyInit.WithService(compose.NewComposeService(dockerCli.Client(), dockerCli.ConfigFile()))
+			lazyInit.WithService(liaison.wrap(compose.NewComposeService(dockerCli.Client(), dockerCli.ConfigFile())))
 			if originalPreRun != nil {
 				return originalPreRun(cmd, args)
 			}
