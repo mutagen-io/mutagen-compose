@@ -36,8 +36,13 @@ func showTopLevelUsage() {
 	// top-level Docker CLI flags and to set usage formatting.
 	cli.SetupRootCommand(root)
 
-	// TODO: Override flag for -H/--host flag since we don't support multiple
-	// specifications.
+	// HACK: Our -H/--host flag only supports a single value, but the Docker CLI
+	// -H/--host flag supports multiple specifications. To correct this in help
+	// output, override the usage message and replace the value storage with one
+	// that will have the correct type.
+	hostFlag := root.Flags().Lookup("host")
+	hostFlag.Usage = "Docker daemon host specification"
+	hostFlag.Value = root.Flags().Lookup("context").Value
 
 	// HACK: Disable help annotations.
 	root.Annotations = nil
