@@ -30,7 +30,9 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 
-	"github.com/mutagen-io/mutagen/pkg/mutagen"
+	mutageninfo "github.com/mutagen-io/mutagen/pkg/mutagen"
+
+	"github.com/mutagen-io/mutagen-compose/pkg/mutagen"
 )
 
 func init() {
@@ -41,7 +43,7 @@ func init() {
 
 // invokeCompose invokes Compose via the plugin infrastructure. It requires that
 // os.Args be set in a manner that emulates execution as a plugin.
-func invokeCompose(liaison *liaison) {
+func invokeCompose() {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
 		lazyInit := api.NewServiceProxy()
 		cmd := commands.RootCommand(lazyInit)
@@ -50,7 +52,7 @@ func invokeCompose(liaison *liaison) {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
-			lazyInit.WithService(liaison.wrap(compose.NewComposeService(dockerCli.Client(), dockerCli.ConfigFile())))
+			lazyInit.WithService(mutagen.Wrap(compose.NewComposeService(dockerCli.Client(), dockerCli.ConfigFile())))
 			if originalPreRun != nil {
 				return originalPreRun(cmd, args)
 			}
@@ -70,6 +72,6 @@ func invokeCompose(liaison *liaison) {
 		manager.Metadata{
 			SchemaVersion: "0.1.0",
 			Vendor:        "Mutagen IO, Inc.",
-			Version:       mutagen.Version,
+			Version:       mutageninfo.Version,
 		})
 }

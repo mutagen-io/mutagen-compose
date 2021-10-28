@@ -78,5 +78,5 @@ func main() {
 	os.Args = emulatedArgs
 
 	// Invoke Compose.
-	invokeCompose(nil)
+	invokeCompose()
 }
