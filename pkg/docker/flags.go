@@ -35,8 +35,6 @@ func (f *Flags) Register(flags *pflag.FlagSet) {
 	flags.StringVar(&f.config, "config", "", "")
 	flags.StringVarP(&f.context, "context", "c", "", "")
 	flags.BoolVarP(&f.debug, "debug", "D", false, "")
-	// TODO: This is technically a list, but I don't think Mutagen would ever
-	// support more than a single value, would it? Could it?
 	flags.StringVarP(&f.host, "host", "H", "", "")
 	flags.StringVarP(&f.logLevel, "log-level", "l", "", "")
 	flags.BoolVar(&f.tls, "tls", false, "")

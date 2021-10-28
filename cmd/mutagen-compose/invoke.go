@@ -62,6 +62,9 @@ func invokeCompose(liaison *liaison) {
 				Status:     err.Error(),
 			}
 		})
+		adjustUsageInformation(cmd)
+		adjustUnknownCommandErrors(cmd)
+		adjustVersionCommand(cmd)
 		return cmd
 	},
 		manager.Metadata{
