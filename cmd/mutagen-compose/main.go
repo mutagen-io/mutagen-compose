@@ -8,6 +8,7 @@ import (
 
 	"github.com/mutagen-io/mutagen-compose/pkg/compose"
 	"github.com/mutagen-io/mutagen-compose/pkg/docker"
+	"github.com/mutagen-io/mutagen-compose/pkg/mutagen"
 )
 
 func main() {
@@ -77,6 +78,12 @@ func main() {
 	emulatedArgs = append(emulatedArgs, commandAndArguments...)
 	os.Args = emulatedArgs
 
+	// Create the Mutagen liaison, defer its shutdown, and register the
+	// top-level Docker CLI flags.
+	liaison := &mutagen.Liaison{}
+	defer liaison.Shutdown()
+	liaison.RegisterDockerCLIFlags(dockerFlags)
+
 	// Invoke Compose.
-	invokeCompose()
+	invokeCompose(liaison)
 }
