@@ -1,18 +1,19 @@
 package mutagen
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/docker/cli/cli/command"
 
-	"github.com/docker/compose/v2/pkg/api"
+	"github.com/docker/docker/client"
 
 	"github.com/compose-spec/compose-go/types"
 
-	"github.com/mutagen-io/mutagen-compose/pkg/docker"
+	"github.com/docker/compose/v2/pkg/api"
 
 	"github.com/mitchellh/mapstructure"
+
+	"github.com/mutagen-io/mutagen-compose/pkg/docker"
 )
 
 // Liaison is the interface point between Compose and Mutagen. Its zero value is
@@ -24,8 +25,8 @@ type Liaison struct {
 	dockerFlags *docker.Flags
 	// dockerCLI is the associated Docker CLI instance.
 	dockerCLI command.Cli
-	// Service is the underlying Compose service.
-	api.Service
+	// composeService is the underlying Compose service.
+	composeService api.Service
 	// configuration is the Mutagen configuration loaded from the x-mutagen
 	// extensions of the Compose project. If it's nil after invoking the
 	// loadConfiguration method, then no x-mutagen extensions were found.
@@ -34,34 +35,55 @@ type Liaison struct {
 
 // Shutdown terminates liaison resource usage.
 func (l *Liaison) Shutdown() error {
-	// TODO: Implement. We'll want to terminate any active Mutagen clients.
+	// TODO: Implement. We'll want to terminate any active Mutagen gRPC clients.
 	return nil
 }
 
 // RegisterDockerCLIFlags registers the associated top-level Docker CLI flags.
-// It must be called before the liaison is used as a Compose service.
 func (l *Liaison) RegisterDockerCLIFlags(dockerFlags *docker.Flags) {
 	l.dockerFlags = dockerFlags
 }
 
-// RegisterDockerCLI registers the associated Docker CLI instance. It must be
-// called before the liaison is used as a Compose service.
-func (l *Liaison) RegisterDockerCLI(dockerCLI command.Cli) {
-	l.dockerCLI = dockerCLI
+// RegisterDockerCLI registers the associated Docker CLI instance.
+func (l *Liaison) RegisterDockerCLI(cli command.Cli) {
+	l.dockerCLI = cli
 }
 
-// RegisterComposeService registers the underlying Compose service. It must be
-// called before the liaison is used as a Compose service.
+// DockerClient returns a Mutagen-aware version of the Docker API client. It
+// must only be called after a Docker CLI is registered with RegisterDockerCLI
+// and said CLI can return a valid API client via its Client method (typically
+// after flag parsing).
+func (l *Liaison) DockerClient() client.APIClient {
+	return &dockerAPIClient{l, l.dockerCLI.Client()}
+}
+
+// RegisterComposeService registers the underlying Compose service. The Compose
+// service must be initialized using the Docker API client returned by the
+// liaison's DockerClient method.
 func (l *Liaison) RegisterComposeService(service api.Service) {
-	l.Service = service
+	l.composeService = service
 }
 
-// loadConfiguration loads the Mutagen configuration from the x-mutagen
-// extensions in a Compose project. It sets the liaison's configuration field
-// according to what is (or isn't) found.
-func (l *Liaison) loadConfiguration(project *types.Project) error {
+// ComposeService returns a Mutagen-aware version of the Compose Service API. It
+// must be called only after a Compose service has been registered with
+// RegisterDockerCLI.
+func (l *Liaison) ComposeService() api.Service {
+	return &composeService{l, l.composeService}
+}
+
+// processProject loads Mutagen configuration from the specified project, adds
+// the Mutagen sidecar service to the project, and sets project dependencies
+// accordingly. If project is nil, this method is a no-op and returns nil.
+func (l *Liaison) processProject(project *types.Project) error {
+	// If the project is nil, then there's nothing to process.
+	if project == nil {
+		return nil
+	}
+
 	// Grab the Mutagen extension section. If it's not present, then there's
 	// nothing to load.
+	// TODO: Do we want to create a nil configuraiton and still inject a sidecar
+	// in this case?
 	xMutagen, ok := project.Extensions["x-mutagen"]
 	if !ok {
 		return nil
@@ -83,88 +105,52 @@ func (l *Liaison) loadConfiguration(project *types.Project) error {
 		return fmt.Errorf("unable to decode x-mutagen section: %w", err)
 	}
 
-	// Success.
+	// TODO: Implement configuration parsing, session specification generation,
+	// service injection, and dependency injection for the project.
+	project.Services = append(project.Services, types.ServiceConfig{
+		Name:  "mutagen",
+		Image: sidecarImage,
+	})
 	return nil
 }
 
-// Up implements github.com/docker/compose/v2/pkg/api.Service.Up.
-func (l *Liaison) Up(ctx context.Context, project *types.Project, options api.UpOptions) error {
-	// Process Mutagen extensions. If none are present, then just dispatch
-	// directly to the underlying Compose service.
-	if err := l.loadConfiguration(project); err != nil {
-		return fmt.Errorf("unable to load Mutagen configuration: %w", err)
-	} else if l.configuration == nil {
-		return l.Service.Up(ctx, project, options)
-	}
-
-	// TODO: Handle Mutagen-based operation.
-	fmt.Println("Mutagen-extended up not yet implemented")
+// reconcileSessions performs Mutagen session reconciliation for the project
+// using the specified sidecar container ID as the target identifier. It also
+// ensures that all sessions are unpaused.
+func (l *Liaison) reconcileSessions(sidecarID string) error {
+	// TODO: Implement.
+	fmt.Println("Reconciling Mutagen sessions for", sidecarID)
 	return nil
 }
 
-// Start implements github.com/docker/compose/v2/pkg/api.Service.Start.
-func (l *Liaison) Start(ctx context.Context, project *types.Project, options api.StartOptions) error {
-	// Process Mutagen extensions. If none are present, then just dispatch
-	// directly to the underlying Compose service.
-	if err := l.loadConfiguration(project); err != nil {
-		return fmt.Errorf("unable to load Mutagen configuration: %w", err)
-	} else if l.configuration == nil {
-		return l.Service.Start(ctx, project, options)
-	}
-
-	// TODO: Handle Mutagen-based operation.
-	fmt.Println("Mutagen-extended start not yet implemented")
+// listSessions lists Mutagen sessions for the project using the specified
+// sidecar container ID as the target identifier.
+func (l *Liaison) listSessions(sidecarID string) error {
+	// TODO: Implement.
+	fmt.Println("Listing Mutagen sessions for", sidecarID)
 	return nil
 }
 
-// RunOneOffContainer implements
-// github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
-func (l *Liaison) RunOneOffContainer(ctx context.Context, project *types.Project, options api.RunOptions) (int, error) {
-	// Process Mutagen extensions. If none are present, then just dispatch
-	// directly to the underlying Compose service.
-	if err := l.loadConfiguration(project); err != nil {
-		return 0, fmt.Errorf("unable to load Mutagen configuration: %w", err)
-	} else if l.configuration == nil {
-		return l.Service.RunOneOffContainer(ctx, project, options)
-	}
-
-	// TODO: Handle Mutagen-based operation.
-	fmt.Println("Mutagen-extended run not yet implemented")
-	return 0, nil
-}
-
-// Ps implements github.com/docker/compose/v2/pkg/api.Service.Ps.
-func (l *Liaison) Ps(ctx context.Context, projectName string, options api.PsOptions) ([]api.ContainerSummary, error) {
-	// TODO: Use the project name and daemon client to identify the Mutagen
-	// sidecar ID and invoke session listing.
-
-	// Dispatch directly to the underlying Compose service.
-	return l.Service.Ps(ctx, projectName, options)
-}
-
-// Stop implements github.com/docker/compose/v2/pkg/api.Service.Stop.
-func (l *Liaison) Stop(ctx context.Context, project *types.Project, options api.StopOptions) error {
-	// Process Mutagen extensions. If none are present, then just dispatch
-	// directly to the underlying Compose service.
-	if err := l.loadConfiguration(project); err != nil {
-		return fmt.Errorf("unable to load Mutagen configuration: %w", err)
-	} else if l.configuration == nil {
-		return l.Service.Stop(ctx, project, options)
-	}
-
-	// TODO: Handle Mutagen-based operation.
-	fmt.Println("Mutagen-extended stop not yet implemented")
+// pauseSessions pauses Mutagen sessions for the project using the specified
+// sidecar container ID as the target identifier.
+func (l *Liaison) pauseSessions(sidecarID string) error {
+	// TODO: Implement.
+	fmt.Println("Pausing Mutagen sessions for", sidecarID)
 	return nil
 }
 
-// Down implements github.com/docker/compose/v2/pkg/api.Service.Down.
-func (l *Liaison) Down(ctx context.Context, projectName string, options api.DownOptions) error {
-	// TODO: Use the project name and daemon client to identify the Mutagen
-	// sidecar ID and invoke session termination, but only if no services have
-	// been explicitly specified.
+// resumeSessions resumes Mutagen sessions for the project using the specified
+// sidecar container ID as the target identifier.
+func (l *Liaison) resumeSessions(sidecarID string) error {
+	// TODO: Implement.
+	fmt.Println("Resuming Mutagen sessions for", sidecarID)
+	return nil
+}
 
-	// TODO: Figure out how Down is operating if options.Project is nil. How
-	// does it know which services to take down in that case? Is it just doing a
-	// filter based on projectName?
-	return l.Service.Down(ctx, projectName, options)
+// terminateSessions terminates Mutagen sessions for the project using the
+// specified sidecar container ID as the target identifier.
+func (l *Liaison) terminateSessions(sidecarID string) error {
+	// TODO: Implement.
+	fmt.Println("Terminating Mutagen sessions for", sidecarID)
+	return nil
 }

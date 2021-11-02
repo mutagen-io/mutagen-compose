@@ -27,6 +27,7 @@ import (
 	"github.com/docker/cli/cli/command"
 
 	commands "github.com/docker/compose/v2/cmd/compose"
+	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 
 	mutageninfo "github.com/mutagen-io/mutagen/pkg/mutagen"
@@ -45,13 +46,15 @@ func init() {
 func invokeCompose(liaison *mutagen.Liaison) {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
 		liaison.RegisterDockerCLI(dockerCli)
-		cmd := commands.RootCommand(liaison)
+		lazyInit := api.NewServiceProxy()
+		cmd := commands.RootCommand(lazyInit)
 		originalPreRun := cmd.PersistentPreRunE
 		cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
-			liaison.RegisterComposeService(compose.NewComposeService(dockerCli.Client(), dockerCli.ConfigFile()))
+			liaison.RegisterComposeService(compose.NewComposeService(liaison.DockerClient(), dockerCli.ConfigFile()))
+			lazyInit.WithService(liaison.ComposeService())
 			if originalPreRun != nil {
 				return originalPreRun(cmd, args)
 			}
