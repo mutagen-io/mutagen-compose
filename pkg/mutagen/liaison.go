@@ -16,7 +16,12 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
+	"github.com/mutagen-io/mutagen/cmd/mutagen/daemon"
+	"github.com/mutagen-io/mutagen/cmd/mutagen/forward"
+	"github.com/mutagen-io/mutagen/cmd/mutagen/sync"
+
 	"github.com/mutagen-io/mutagen/pkg/forwarding"
+	"github.com/mutagen-io/mutagen/pkg/grpcutil"
 	"github.com/mutagen-io/mutagen/pkg/mutagen"
 	"github.com/mutagen-io/mutagen/pkg/selection"
 	forwardingsvc "github.com/mutagen-io/mutagen/pkg/service/forwarding"
@@ -370,14 +375,16 @@ func (l *Liaison) processProject(project *types.Project) error {
 	}
 
 	// Determine which services have a dependency on the volumes that Mutagen
-	// is targeting and add a Mutagen service dependency for each.
-	for _, service := range project.Services {
-		for _, volume := range service.Volumes {
+	// is targeting and add a Mutagen service dependency for each. Note that we
+	// have to assign and store dependencies by index because services are
+	// stored by value in the project.
+	for s := range project.Services {
+		for _, volume := range project.Services[s].Volumes {
 			if volume.Type == "volume" && volumeDependencies[volume.Source] {
-				if service.DependsOn == nil {
-					service.DependsOn = make(types.DependsOnConfig)
+				if project.Services[s].DependsOn == nil {
+					project.Services[s].DependsOn = make(types.DependsOnConfig)
 				}
-				service.DependsOn[sidecarServiceName] = types.ServiceDependency{
+				project.Services[s].DependsOn[sidecarServiceName] = types.ServiceDependency{
 					Condition: types.ServiceConditionStarted,
 				}
 				break
@@ -420,52 +427,293 @@ func (l *Liaison) processProject(project *types.Project) error {
 // using the specified sidecar container ID as the target identifier. It also
 // ensures that all sessions are unpaused.
 func (l *Liaison) reconcileSessions(sidecarID string) error {
-	// Convert sidecar URLs to concrete Docker URLs.
+	// Convert sidecar URLs to concrete Docker URLs and add sidecar ID labels.
 	dockerHost := l.dockerCLI.Client().DaemonHost()
 	for _, specification := range l.forwarding {
 		reifySidecarURLIfNecessary(specification.Source, dockerHost, sidecarID)
 		reifySidecarURLIfNecessary(specification.Destination, dockerHost, sidecarID)
-		// TODO: Attach sidecar label.
+		specification.Labels = map[string]string{
+			sessionSidecarLabelKey: chopSidecarIdentifier(sidecarID),
+		}
 	}
 	for _, specification := range l.synchronization {
 		reifySidecarURLIfNecessary(specification.Alpha, dockerHost, sidecarID)
 		reifySidecarURLIfNecessary(specification.Beta, dockerHost, sidecarID)
-		// TODO: Attach sidecar label.
+		specification.Labels = map[string]string{
+			sessionSidecarLabelKey: chopSidecarIdentifier(sidecarID),
+		}
 	}
 
-	// TODO: Implement.
-	fmt.Println("Reconciling Mutagen sessions for", sidecarID)
+	// Connect to the Mutagen daemon and defer closure of the connection.
+	daemonConnection, err := daemon.Connect(true, true)
+	if err != nil {
+		return fmt.Errorf("unable to connect to Mutagen daemon: %w", err)
+	}
+	defer daemonConnection.Close()
+
+	// Create service clients.
+	forwardingService := forwardingsvc.NewForwardingClient(daemonConnection)
+	synchronizationService := synchronizationsvc.NewSynchronizationClient(daemonConnection)
+
+	// Create the session selection criteria.
+	projectSelection := &selection.Selection{
+		LabelSelector: fmt.Sprintf("%s == %s", sessionSidecarLabelKey, chopSidecarIdentifier(sidecarID)),
+	}
+
+	// Query existing forwarding sessions.
+	forwardingListRequest := &forwardingsvc.ListRequest{Selection: projectSelection}
+	forwardingListResponse, err := forwardingService.List(context.Background(), forwardingListRequest)
+	if err != nil {
+		return fmt.Errorf("forwarding session listing failed: %w", grpcutil.PeelAwayRPCErrorLayer(err))
+	} else if err = forwardingListResponse.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid forwarding session listing response received: %w", err)
+	}
+
+	// Query existing synchronization sessions.
+	synchronizationListRequest := &synchronizationsvc.ListRequest{Selection: projectSelection}
+	synchronizationListResponse, err := synchronizationService.List(context.Background(), synchronizationListRequest)
+	if err != nil {
+		return fmt.Errorf("synchronization session listing failed: %w", grpcutil.PeelAwayRPCErrorLayer(err))
+	} else if err = synchronizationListResponse.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid synchronization session listing response received: %w", err)
+	}
+
+	// Identify orphan forwarding sessions with no corresponding definition, as
+	// well as any duplicate forwarding sessions. At the same time, construct a
+	// map from session name to existing session.
+	var forwardingPruneList []string
+	forwardingNameToSession := make(map[string]*forwarding.Session)
+	for _, state := range forwardingListResponse.SessionStates {
+		if _, defined := l.forwarding[state.Session.Name]; !defined {
+			forwardingPruneList = append(forwardingPruneList, state.Session.Identifier)
+		} else if _, duplicated := forwardingNameToSession[state.Session.Name]; duplicated {
+			forwardingPruneList = append(forwardingPruneList, state.Session.Identifier)
+		} else {
+			forwardingNameToSession[state.Session.Name] = state.Session
+		}
+	}
+
+	// Identify orphan synchronization sessions with no corresponding
+	// definition, as well as any duplicate synchronization sessions. At the
+	// same time, construct a map from session name to existing session.
+	var synchronizationPruneList []string
+	synchronizationNameToSession := make(map[string]*synchronization.Session)
+	for _, state := range synchronizationListResponse.SessionStates {
+		if _, defined := l.synchronization[state.Session.Name]; !defined {
+			synchronizationPruneList = append(synchronizationPruneList, state.Session.Identifier)
+		} else if _, duplicated := synchronizationNameToSession[state.Session.Name]; duplicated {
+			synchronizationPruneList = append(synchronizationPruneList, state.Session.Identifier)
+		} else {
+			synchronizationNameToSession[state.Session.Name] = state.Session
+		}
+	}
+
+	// Identify forwarding sessions that need to be created or recreated.
+	var forwardingCreateSpecifications []*forwardingsvc.CreationSpecification
+	for name, specification := range l.forwarding {
+		if existing, ok := forwardingNameToSession[name]; !ok {
+			forwardingCreateSpecifications = append(forwardingCreateSpecifications, specification)
+		} else if !forwardingSessionCurrent(existing, specification) {
+			forwardingPruneList = append(forwardingPruneList, existing.Identifier)
+			forwardingCreateSpecifications = append(forwardingCreateSpecifications, specification)
+		}
+	}
+
+	// Identify synchronization sessions that need to be created or recreated.
+	var synchronizationCreateSpecifications []*synchronizationsvc.CreationSpecification
+	for name, specification := range l.synchronization {
+		if existing, ok := synchronizationNameToSession[name]; !ok {
+			synchronizationCreateSpecifications = append(synchronizationCreateSpecifications, specification)
+		} else if !synchronizationSessionCurrent(existing, specification) {
+			synchronizationPruneList = append(synchronizationPruneList, existing.Identifier)
+			synchronizationCreateSpecifications = append(synchronizationCreateSpecifications, specification)
+		}
+	}
+
+	// Prune orphaned and stale forwarding sessions.
+	if len(forwardingPruneList) > 0 {
+		fmt.Println("Pruning forwarding sessions")
+		pruneSelection := &selection.Selection{Specifications: forwardingPruneList}
+		if err := forward.TerminateWithSelection(daemonConnection, pruneSelection); err != nil {
+			return fmt.Errorf("unable to prune orphaned/duplicate/stale forwarding sessions: %w", err)
+		}
+	}
+
+	// Prune orphaned and stale synchronization sessions.
+	if len(synchronizationPruneList) > 0 {
+		fmt.Println("Pruning synchronization sessions")
+		pruneSelection := &selection.Selection{Specifications: synchronizationPruneList}
+		if err := sync.TerminateWithSelection(daemonConnection, pruneSelection); err != nil {
+			return fmt.Errorf("unable to prune orphaned/duplicate/stale synchronization sessions: %w", err)
+		}
+	}
+
+	// Ensure that all existing sessions are unpaused and connected. This is a
+	// no-op for sessions that are already running and connected. We want to do
+	// this in case the Mutagen service is being restarted after a system
+	// shutdown or stop operation, in which case sessions may be waiting to
+	// reconnect or paused, respectively.
+	fmt.Println("Resuming existing forwarding sessions")
+	if err := forward.ResumeWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("forwarding resumption failed: %w", err)
+	}
+	fmt.Println("Resuming existing synchronization sessions")
+	if err := sync.ResumeWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("synchronization resumption failed: %w", err)
+	}
+
+	// Create forwarding sessions.
+	for _, specification := range forwardingCreateSpecifications {
+		fmt.Printf("Creating forwarding session \"%s\"\n", specification.Name)
+		if _, err := forward.CreateWithSpecification(daemonConnection, specification); err != nil {
+			return fmt.Errorf("unable to create forwarding session (%s): %w", specification.Name, err)
+		}
+	}
+
+	// Create synchronization sessions.
+	var newSynchronizationSessions []string
+	for _, specification := range synchronizationCreateSpecifications {
+		fmt.Printf("Creating synchronization session \"%s\"\n", specification.Name)
+		if s, err := sync.CreateWithSpecification(daemonConnection, specification); err != nil {
+			return fmt.Errorf("unable to create synchronization session (%s): %w", specification.Name, err)
+		} else {
+			newSynchronizationSessions = append(newSynchronizationSessions, s)
+		}
+	}
+
+	// Flush newly created synchronization sessions.
+	if len(newSynchronizationSessions) > 0 {
+		fmt.Println("Performing initial synchronization")
+		flushSelection := &selection.Selection{Specifications: newSynchronizationSessions}
+		if err := sync.FlushWithSelection(daemonConnection, flushSelection, false); err != nil {
+			return fmt.Errorf("unable to flush synchronization session(s): %w", err)
+		}
+	}
+
+	// Success.
 	return nil
 }
 
 // listSessions lists Mutagen sessions for the project using the specified
 // sidecar container ID as the target identifier.
 func (l *Liaison) listSessions(sidecarID string) error {
-	// TODO: Implement.
-	fmt.Println("Listing Mutagen sessions for", sidecarID)
+	// Connect to the Mutagen daemon and defer closure of the connection.
+	daemonConnection, err := daemon.Connect(true, true)
+	if err != nil {
+		return fmt.Errorf("unable to connect to Mutagen daemon: %w", err)
+	}
+	defer daemonConnection.Close()
+
+	// Create the session selection criteria.
+	projectSelection := &selection.Selection{
+		LabelSelector: fmt.Sprintf("%s == %s", sessionSidecarLabelKey, chopSidecarIdentifier(sidecarID)),
+	}
+
+	// Perform forwarding session listing.
+	fmt.Println("Forwarding sessions")
+	if err := forward.ListWithSelection(daemonConnection, projectSelection, false); err != nil {
+		return fmt.Errorf("forwarding listing failed: %w", err)
+	}
+
+	// Perform synchronization session listing.
+	fmt.Println("Synchronization sessions")
+	if err := sync.ListWithSelection(daemonConnection, projectSelection, false); err != nil {
+		return fmt.Errorf("synchronization listing failed: %w", err)
+	}
+
+	// Success.
 	return nil
 }
 
 // pauseSessions pauses Mutagen sessions for the project using the specified
 // sidecar container ID as the target identifier.
 func (l *Liaison) pauseSessions(sidecarID string) error {
-	// TODO: Implement.
-	fmt.Println("Pausing Mutagen sessions for", sidecarID)
+	// Connect to the Mutagen daemon and defer closure of the connection.
+	daemonConnection, err := daemon.Connect(true, true)
+	if err != nil {
+		return fmt.Errorf("unable to connect to Mutagen daemon: %w", err)
+	}
+	defer daemonConnection.Close()
+
+	// Create the session selection criteria.
+	projectSelection := &selection.Selection{
+		LabelSelector: fmt.Sprintf("%s == %s", sessionSidecarLabelKey, chopSidecarIdentifier(sidecarID)),
+	}
+
+	// Perform forwarding session pausing.
+	fmt.Println("Pausing forwarding sessions")
+	if err := forward.PauseWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("forwarding pausing failed: %w", err)
+	}
+
+	// Perform synchronization session pausing.
+	fmt.Println("Pausing synchronization sessions")
+	if err := sync.PauseWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("synchronization pausing failed: %w", err)
+	}
+
+	// Success.
 	return nil
 }
 
 // resumeSessions resumes Mutagen sessions for the project using the specified
 // sidecar container ID as the target identifier.
 func (l *Liaison) resumeSessions(sidecarID string) error {
-	// TODO: Implement.
-	fmt.Println("Resuming Mutagen sessions for", sidecarID)
+	// Connect to the Mutagen daemon and defer closure of the connection.
+	daemonConnection, err := daemon.Connect(true, true)
+	if err != nil {
+		return fmt.Errorf("unable to connect to Mutagen daemon: %w", err)
+	}
+	defer daemonConnection.Close()
+
+	// Create the session selection criteria.
+	projectSelection := &selection.Selection{
+		LabelSelector: fmt.Sprintf("%s == %s", sessionSidecarLabelKey, chopSidecarIdentifier(sidecarID)),
+	}
+
+	// Perform forwarding session resumption.
+	fmt.Println("Resuming forwarding sessions")
+	if err := forward.ResumeWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("forwarding resumption failed: %w", err)
+	}
+
+	// Perform synchronization session resumption.
+	fmt.Println("Resuming synchronization sessions")
+	if err := sync.ResumeWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("synchronization resumption failed: %w", err)
+	}
+
+	// Success.
 	return nil
 }
 
 // terminateSessions terminates Mutagen sessions for the project using the
 // specified sidecar container ID as the target identifier.
 func (l *Liaison) terminateSessions(sidecarID string) error {
-	// TODO: Implement.
-	fmt.Println("Terminating Mutagen sessions for", sidecarID)
+	// Connect to the Mutagen daemon and defer closure of the connection.
+	daemonConnection, err := daemon.Connect(true, true)
+	if err != nil {
+		return fmt.Errorf("unable to connect to Mutagen daemon: %w", err)
+	}
+	defer daemonConnection.Close()
+
+	// Create the session selection criteria.
+	projectSelection := &selection.Selection{
+		LabelSelector: fmt.Sprintf("%s == %s", sessionSidecarLabelKey, chopSidecarIdentifier(sidecarID)),
+	}
+
+	// Perform forwarding session termination.
+	fmt.Println("Terminating forwarding sessions")
+	if err := forward.TerminateWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("forwarding termination failed: %w", err)
+	}
+
+	// Perform synchronization session termination.
+	fmt.Println("Terminating synchronization sessions")
+	if err := sync.TerminateWithSelection(daemonConnection, projectSelection); err != nil {
+		return fmt.Errorf("synchronization termination failed: %w", err)
+	}
+
+	// Success.
 	return nil
 }

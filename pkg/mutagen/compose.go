@@ -2,7 +2,11 @@ package mutagen
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	moby "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 
 	"github.com/compose-spec/compose-go/types"
 
@@ -107,7 +111,26 @@ func (s *composeService) Logs(ctx context.Context, projectName string, consumer 
 
 // Ps implements github.com/docker/compose/v2/pkg/api.Service.Ps.
 func (s *composeService) Ps(ctx context.Context, projectName string, options api.PsOptions) ([]api.ContainerSummary, error) {
-	// TODO: Get the Mutagen Compose sidecar ID and invoke s.liaison.listSessions.
+	// Perform a query to identify the Mutagen Compose sidecar container. We
+	// allow it to not exist, but we don't allow multiple matches.
+	containers, err := s.liaison.dockerCLI.Client().ContainerList(ctx, moby.ContainerListOptions{
+		Filters: filters.NewArgs(
+			filters.Arg("label", fmt.Sprintf("%s=%s", api.ProjectLabel, projectName)),
+			filters.Arg("label", fmt.Sprintf("%s=%s", sidecarRoleLabelKey, sidecarRoleLabelValue)),
+		),
+		All: true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("unable to query Mutagen sidecar container: %w", err)
+	} else if len(containers) > 1 {
+		return nil, errors.New("multiple Mutagen sidecar containers identified")
+	} else if len(containers) == 1 {
+		if err := s.liaison.listSessions(containers[0].ID); err != nil {
+			return nil, err
+		}
+	}
+
+	// Invoke the underlying implementation.
 	return s.service.Ps(ctx, projectName, options)
 }
 
