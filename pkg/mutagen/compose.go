@@ -157,6 +157,19 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 		return 0, fmt.Errorf("unable to process project: %w", err)
 	}
 
+	// If dependency waiting has been disabled and the target service has a
+	// dependency on the Mutagen Compose sidecar service, then return an error.
+	if options.NoDeps {
+		for _, service := range project.Services {
+			if service.Name == options.Service {
+				if _, ok := service.DependsOn[sidecarServiceName]; ok {
+					return 0, errors.New("service depends on Mutagen for synchronization but has dependencies disabled")
+				}
+				break
+			}
+		}
+	}
+
 	// Invoke the underlying implementation.
 	return s.service.RunOneOffContainer(ctx, project, options)
 }
