@@ -6,6 +6,7 @@ require (
 	github.com/compose-spec/compose-go v1.0.2
 	github.com/docker/cli v20.10.7+incompatible
 	github.com/docker/compose/v2 v2.0.1
+	github.com/docker/docker v20.10.7+incompatible
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mutagen-io/mutagen v0.13.0-beta1
 	github.com/spf13/cobra v1.2.1
@@ -35,7 +36,6 @@ require (
 	github.com/distribution/distribution/v3 v3.0.0-20210316161203-a01c71e2477e // indirect
 	github.com/docker/buildx v0.5.2-0.20210422185057-908a856079fc // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
-	github.com/docker/docker v20.10.7+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4-0.20210125172408-38bea2ce277a // indirect
 	github.com/docker/go v1.5.1-1.0.20160303222718-d30aec9fd63c // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -43,6 +43,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/eknkc/basex v1.0.1 // indirect
+	github.com/fatih/color v1.12.0 // indirect
 	github.com/fvbommel/sortorder v1.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gofrs/flock v0.8.0 // indirect
@@ -82,6 +83,8 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/mutagen-io/extstat v0.0.0-20210224131814-32fa3f057fa8 // indirect
+	github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 // indirect
 	github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect

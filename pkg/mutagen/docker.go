@@ -3,7 +3,6 @@ package mutagen
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -31,10 +30,8 @@ func (c *dockerAPIClient) isMutagenComposeSidecar(ctx context.Context, container
 		return false, fmt.Errorf("unable to inspect container: %w", err)
 	}
 
-	// Check if this is the Mutagen sidecar container.
-	// TODO: Figure out how we want to do this check. We probably want to check
-	// metadata.Config.Labels. In any case, we want this check to be fast.
-	return strings.Contains(metadata.Name, "mutagen"), nil
+	// Check if this is a Mutagen Compose sidecar container.
+	return metadata.Config.Labels[sidecarRoleLabelKey] == sidecarRoleLabelValue, nil
 }
 
 // ContainerStart implements

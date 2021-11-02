@@ -78,10 +78,8 @@ func main() {
 	emulatedArgs = append(emulatedArgs, commandAndArguments...)
 	os.Args = emulatedArgs
 
-	// Create the Mutagen liaison, defer its shutdown, and register the
-	// top-level Docker CLI flags.
+	// Create the Mutagen liaison.
 	liaison := &mutagen.Liaison{}
-	defer liaison.Shutdown()
 
 	// Invoke Compose.
 	invokeCompose(liaison)
