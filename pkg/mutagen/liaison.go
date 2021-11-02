@@ -12,8 +12,6 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 
 	"github.com/mitchellh/mapstructure"
-
-	"github.com/mutagen-io/mutagen-compose/pkg/docker"
 )
 
 // Liaison is the interface point between Compose and Mutagen. Its zero value is
@@ -21,8 +19,6 @@ import (
 // single-use type, is not safe for concurrent usage, and its Shutdown method
 // should be invoked when usage is complete.
 type Liaison struct {
-	// dockerFlags are the associated top-level Docker CLI flags.
-	dockerFlags *docker.Flags
 	// dockerCLI is the associated Docker CLI instance.
 	dockerCLI command.Cli
 	// composeService is the underlying Compose service.
@@ -37,11 +33,6 @@ type Liaison struct {
 func (l *Liaison) Shutdown() error {
 	// TODO: Implement. We'll want to terminate any active Mutagen gRPC clients.
 	return nil
-}
-
-// RegisterDockerCLIFlags registers the associated top-level Docker CLI flags.
-func (l *Liaison) RegisterDockerCLIFlags(dockerFlags *docker.Flags) {
-	l.dockerFlags = dockerFlags
 }
 
 // RegisterDockerCLI registers the associated Docker CLI instance.

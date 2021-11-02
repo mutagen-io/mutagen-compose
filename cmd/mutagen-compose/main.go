@@ -82,7 +82,6 @@ func main() {
 	// top-level Docker CLI flags.
 	liaison := &mutagen.Liaison{}
 	defer liaison.Shutdown()
-	liaison.RegisterDockerCLIFlags(dockerFlags)
 
 	// Invoke Compose.
 	invokeCompose(liaison)

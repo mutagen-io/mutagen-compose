@@ -45,7 +45,6 @@ func init() {
 // os.Args be set in a manner that emulates execution as a plugin.
 func invokeCompose(liaison *mutagen.Liaison) {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
-		liaison.RegisterDockerCLI(dockerCli)
 		lazyInit := api.NewServiceProxy()
 		cmd := commands.RootCommand(lazyInit)
 		originalPreRun := cmd.PersistentPreRunE
@@ -53,6 +52,7 @@ func invokeCompose(liaison *mutagen.Liaison) {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
+			liaison.RegisterDockerCLI(dockerCli)
 			liaison.RegisterComposeService(compose.NewComposeService(liaison.DockerClient(), dockerCli.ConfigFile()))
 			lazyInit.WithService(liaison.ComposeService())
 			if originalPreRun != nil {
