@@ -47,7 +47,7 @@ func (c *dockerAPIClient) ContainerStart(ctx context.Context, container string, 
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.reconcileSessions(container); err != nil {
+		if err := c.liaison.reconcileSessions(ctx, container); err != nil {
 			return fmt.Errorf("unable to reconcile Mutagen sessions: %w", err)
 		}
 	}
@@ -64,7 +64,7 @@ func (c *dockerAPIClient) ContainerPause(ctx context.Context, container string) 
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.pauseSessions(container); err != nil {
+		if err := c.liaison.pauseSessions(ctx, container); err != nil {
 			return fmt.Errorf("unable to pause Mutagen sessions: %w", err)
 		}
 	}
@@ -86,7 +86,7 @@ func (c *dockerAPIClient) ContainerUnpause(ctx context.Context, container string
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.resumeSessions(container); err != nil {
+		if err := c.liaison.resumeSessions(ctx, container); err != nil {
 			return fmt.Errorf("unable to resume Mutagen sessions: %w", err)
 		}
 	}
@@ -103,7 +103,7 @@ func (c *dockerAPIClient) ContainerStop(ctx context.Context, container string, t
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.pauseSessions(container); err != nil {
+		if err := c.liaison.pauseSessions(ctx, container); err != nil {
 			return fmt.Errorf("unable to pause Mutagen sessions: %w", err)
 		}
 	}
@@ -120,7 +120,7 @@ func (c *dockerAPIClient) ContainerRemove(ctx context.Context, container string,
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.terminateSessions(container); err != nil {
+		if err := c.liaison.terminateSessions(ctx, container); err != nil {
 			return fmt.Errorf("unable to terminate Mutagen sessions: %w", err)
 		}
 	}

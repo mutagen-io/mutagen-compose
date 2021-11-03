@@ -125,7 +125,7 @@ func (s *composeService) Ps(ctx context.Context, projectName string, options api
 	} else if len(containers) > 1 {
 		return nil, errors.New("multiple Mutagen sidecar containers identified")
 	} else if len(containers) == 1 {
-		if err := s.liaison.listSessions(containers[0].ID); err != nil {
+		if err := s.liaison.listSessions(ctx, containers[0].ID); err != nil {
 			return nil, err
 		}
 	}
