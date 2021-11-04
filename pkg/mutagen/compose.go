@@ -51,6 +51,19 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
+	// Create the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for the flag-related reasons outlined there (the
+	// hidden start progress updates aren't an issue for create).
+	services := project.Services
+	disabledServices := project.DisabledServices
+	project.Services = services[len(services)-1:]
+	project.DisabledServices = nil
+	if err := s.service.Create(ctx, project, api.CreateOptions{IgnoreOrphans: true}); err != nil {
+		return fmt.Errorf("unable to create Mutagen Compose sidecar service: %w", err)
+	}
+	project.Services = services[:len(services)-1]
+	project.DisabledServices = append(disabledServices, services[len(services)-1])
+
 	// Invoke the underlying implementation.
 	return s.service.Create(ctx, project, options)
 }
@@ -61,6 +74,19 @@ func (s *composeService) Start(ctx context.Context, project *types.Project, opti
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
 	}
+
+	// Start the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for the flag-related reasons outlined there (the
+	// hidden start progress updates aren't an issue for start).
+	services := project.Services
+	disabledServices := project.DisabledServices
+	project.Services = services[len(services)-1:]
+	project.DisabledServices = nil
+	if err := s.service.Start(ctx, project, api.StartOptions{}); err != nil {
+		return fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)
+	}
+	project.Services = services[:len(services)-1]
+	project.DisabledServices = append(disabledServices, services[len(services)-1])
 
 	// Invoke the underlying implementation.
 	return s.service.Start(ctx, project, options)
@@ -88,6 +114,46 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
 	}
+
+	// Bring up the Mutagen Compose sidecar service first. We do this for two
+	// reasons: First, we don't want user-specified up flags (which might be
+	// incompatible with or inappropriate for Mutagen operation) to affect the
+	// Mutagen Compose sidecar service. Second, if the up operation is running
+	// attached (which it is by default and in most usage), then only create
+	// progress updates are displayed and start updates are hidden since they
+	// would conflict with service logs. This is a problem because the progress
+	// updates that Liaison.reconcileSessions emits (which are some of the
+	// longest-running and most important) appear as part of the start updates.
+	//
+	// Conceptually, we want Mutagen to be on-par with volumes and networks and
+	// other project infrastructure that's initialized pre-services (even though
+	// Mutagen support is implemented, in part, by a service). There might be
+	// some microscopic performance advantage to be gained by relying on service
+	// dependencies to bring up Mutagen only when necessary, but that advantaged
+	// is dwarfed by the disadvantages of hiding start up progress updates,
+	// allowing Mutagen to be subject to user-specified flags, and the general
+	// inconsistency that would arise when relying on depends_on (volumes and
+	// networks, for example, are always created when any service starts,
+	// regardless of whether or not it depends on them).
+	//
+	// To do this, we'll need to temporarily filter the service lists to include
+	// only the Mutagen service, because although the underlying create call
+	// will filter services if a list is specified in the create options, the
+	// underlying start call has no such option field. In this case, we'll tell
+	// the up operation to ignore orphans, since all other services at that
+	// point would be orphans. After that, we'll restore the service lists and
+	// Mutagen into disabled services since we don't want it to be subject to
+	// the user's up operation (but we also don't want it to be flagged as an
+	// orphan service).
+	services := project.Services
+	disabledServices := project.DisabledServices
+	project.Services = services[len(services)-1:]
+	project.DisabledServices = nil
+	if err := s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+		return fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
+	}
+	project.Services = services[:len(services)-1]
+	project.DisabledServices = append(disabledServices, services[len(services)-1])
 
 	// Invoke the underlying implementation.
 	return s.service.Up(ctx, project, options)
@@ -157,18 +223,17 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 		return 0, fmt.Errorf("unable to process project: %w", err)
 	}
 
-	// If dependency waiting has been disabled and the target service has a
-	// dependency on the Mutagen Compose sidecar service, then return an error.
-	if options.NoDeps {
-		for _, service := range project.Services {
-			if service.Name == options.Service {
-				if _, ok := service.DependsOn[sidecarServiceName]; ok {
-					return 0, errors.New("service depends on Mutagen for synchronization but has dependencies disabled")
-				}
-				break
-			}
-		}
+	// Bring up the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for reasons outlined there.
+	services := project.Services
+	disabledServices := project.DisabledServices
+	project.Services = services[len(services)-1:]
+	project.DisabledServices = nil
+	if err := s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+		return 0, fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
 	}
+	project.Services = services[:len(services)-1]
+	project.DisabledServices = append(disabledServices, services[len(services)-1])
 
 	// Invoke the underlying implementation.
 	return s.service.RunOneOffContainer(ctx, project, options)

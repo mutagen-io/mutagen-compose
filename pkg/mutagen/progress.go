@@ -31,7 +31,7 @@ func (u *statusUpdater) working(description string) {
 
 // error registers an error event.
 func (u *statusUpdater) error(err error) {
-	u.writer.Event(progress.NewEvent(u.eventID, progress.Error, "Error: " + err.Error()))
+	u.writer.Event(progress.NewEvent(u.eventID, progress.Error, "Error: "+err.Error()))
 }
 
 // done registers a done event.

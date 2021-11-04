@@ -75,10 +75,11 @@ func (l *Liaison) ComposeService() api.Service {
 }
 
 // processProject loads Mutagen configuration from the specified project, adds
-// the Mutagen sidecar service to the project, and sets project dependencies
-// accordingly. If project is nil, this method is a no-op and returns nil. This
-// method must only be called after the associated Docker CLI (registered with
-// RegisterDockerCLI) can return a valid API client via its Client method.
+// the Mutagen Compose sidecar service to the project (as the last service), and
+// sets project dependencies accordingly. If project is nil, this method is a
+// no-op and returns nil. This method must only be called after the associated
+// Docker CLI (registered with RegisterDockerCLI) can return a valid API client
+// via its Client method.
 func (l *Liaison) processProject(project *types.Project) error {
 	// If the project is nil, then there's nothing to process. In this case,
 	// containers are typically operated on by project name and label selection,
@@ -91,7 +92,12 @@ func (l *Liaison) processProject(project *types.Project) error {
 	// Check for service name conflicts with explicitly-defined services.
 	for _, service := range project.Services {
 		if service.Name == sidecarServiceName {
-			return fmt.Errorf("Mutagen sidecar service name (%s) conflicts with existing service", sidecarServiceName)
+			return fmt.Errorf("user-defined service (%s) conflicts with Mutagen Compose sidecar service", sidecarServiceName)
+		}
+	}
+	for _, service := range project.DisabledServices {
+		if service.Name == sidecarServiceName {
+			return fmt.Errorf("disabled user-defined service (%s) conflicts with Mutagen Compose sidecar service", sidecarServiceName)
 		}
 	}
 
@@ -371,24 +377,6 @@ func (l *Liaison) processProject(project *types.Project) error {
 	for volume := range volumeDependencies {
 		if _, ok := project.Volumes[volume]; !ok {
 			return fmt.Errorf("undefined volume (%s) referenced by synchronization session", volume)
-		}
-	}
-
-	// Determine which services have a dependency on the volumes that Mutagen
-	// is targeting and add a Mutagen service dependency for each. Note that we
-	// have to assign and store dependencies by index because services are
-	// stored by value in the project.
-	for s := range project.Services {
-		for _, volume := range project.Services[s].Volumes {
-			if volume.Type == "volume" && volumeDependencies[volume.Source] {
-				if project.Services[s].DependsOn == nil {
-					project.Services[s].DependsOn = make(types.DependsOnConfig)
-				}
-				project.Services[s].DependsOn[sidecarServiceName] = types.ServiceDependency{
-					Condition: types.ServiceConditionStarted,
-				}
-				break
-			}
 		}
 	}
 
