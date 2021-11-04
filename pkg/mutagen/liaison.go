@@ -564,7 +564,7 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	if len(forwardingPruneList) > 0 {
 		status.working("Pruning stale Mutagen forwarding sessions")
 		pruneSelection := &selection.Selection{Specifications: forwardingPruneList}
-		if err := forwardTerminateWithSelection(ctx, forwardingService, prompter, pruneSelection); err != nil {
+		if err := forwardingTerminateWithSelection(ctx, forwardingService, prompter, pruneSelection); err != nil {
 			statusErr = fmt.Errorf("unable to prune orphaned/duplicate/stale forwarding sessions: %w", err)
 			return statusErr
 		}
@@ -574,7 +574,7 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	if len(synchronizationPruneList) > 0 {
 		status.working("Pruning stale Mutagen synchronization sessions")
 		pruneSelection := &selection.Selection{Specifications: synchronizationPruneList}
-		if err := syncTerminateWithSelection(ctx, synchronizationService, prompter, pruneSelection); err != nil {
+		if err := synchronizationTerminateWithSelection(ctx, synchronizationService, prompter, pruneSelection); err != nil {
 			statusErr = fmt.Errorf("unable to prune orphaned/duplicate/stale synchronization sessions: %w", err)
 			return statusErr
 		}
@@ -586,12 +586,12 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	// shutdown or stop operation, in which case sessions may be waiting to
 	// reconnect or paused, respectively.
 	status.working("Resuming Mutagen forwarding sessions")
-	if err := forwardResumeWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
+	if err := forwardingResumeWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("forwarding resumption failed: %w", err)
 		return statusErr
 	}
 	status.working("Resuming Mutagen synchronization sessions")
-	if err := syncResumeWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
+	if err := synchronizationResumeWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("synchronization resumption failed: %w", err)
 		return statusErr
 	}
@@ -599,7 +599,7 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	// Create forwarding sessions.
 	for _, specification := range forwardingCreateSpecifications {
 		status.working(fmt.Sprintf("Creating Mutagen forwarding session \"%s\"", specification.Name))
-		if _, err := forwardCreateWithSpecification(ctx, forwardingService, prompter, specification); err != nil {
+		if _, err := forwardingCreateWithSpecification(ctx, forwardingService, prompter, specification); err != nil {
 			statusErr = fmt.Errorf("unable to create forwarding session (%s): %w", specification.Name, err)
 			return statusErr
 		}
@@ -609,7 +609,7 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	var newSynchronizationSessions []string
 	for _, specification := range synchronizationCreateSpecifications {
 		status.working(fmt.Sprintf("Creating Mutagen synchronization session \"%s\"", specification.Name))
-		if s, err := syncCreateWithSpecification(ctx, synchronizationService, prompter, specification); err != nil {
+		if s, err := synchronizationCreateWithSpecification(ctx, synchronizationService, prompter, specification); err != nil {
 			statusErr = fmt.Errorf("unable to create synchronization session (%s): %w", specification.Name, err)
 			return statusErr
 		} else {
@@ -621,7 +621,7 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	if len(newSynchronizationSessions) > 0 {
 		status.working("Flushing Mutagen synchronization sessions")
 		flushSelection := &selection.Selection{Specifications: newSynchronizationSessions}
-		if err := syncFlushWithSelection(ctx, synchronizationService, prompter, flushSelection); err != nil {
+		if err := synchronizationFlushWithSelection(ctx, synchronizationService, prompter, flushSelection); err != nil {
 			statusErr = fmt.Errorf("unable to flush synchronization sessions: %w", err)
 			return statusErr
 		}
@@ -714,14 +714,14 @@ func (l *Liaison) pauseSessions(ctx context.Context, sidecarID string) error {
 
 	// Perform forwarding session pausing.
 	status.working("Pausing forwarding sessions")
-	if err := forwardPauseWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
+	if err := forwardingPauseWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("forwarding pausing failed: %w", err)
 		return statusErr
 	}
 
 	// Perform synchronization session pausing.
 	status.working("Pausing synchronization sessions")
-	if err := syncPauseWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
+	if err := synchronizationPauseWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("synchronization pausing failed: %w", err)
 		return statusErr
 	}
@@ -782,14 +782,14 @@ func (l *Liaison) resumeSessions(ctx context.Context, sidecarID string) error {
 
 	// Perform forwarding session resumption.
 	status.working("Resuming forwarding sessions")
-	if err := forwardResumeWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
+	if err := forwardingResumeWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("forwarding resumption failed: %w", err)
 		return statusErr
 	}
 
 	// Perform synchronization session resumption.
 	status.working("Resuming synchronization sessions")
-	if err := syncResumeWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
+	if err := synchronizationResumeWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("synchronization resumption failed: %w", err)
 		return statusErr
 	}
@@ -850,14 +850,14 @@ func (l *Liaison) terminateSessions(ctx context.Context, sidecarID string) error
 
 	// Perform forwarding session termination.
 	status.working("Terminating forwarding sessions")
-	if err := forwardTerminateWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
+	if err := forwardingTerminateWithSelection(ctx, forwardingService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("forwarding termination failed: %w", err)
 		return statusErr
 	}
 
 	// Perform synchronization session termination.
 	status.working("Terminating synchronization sessions")
-	if err := syncTerminateWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
+	if err := synchronizationTerminateWithSelection(ctx, synchronizationService, prompter, projectSelection); err != nil {
 		statusErr = fmt.Errorf("synchronization termination failed: %w", err)
 		return statusErr
 	}

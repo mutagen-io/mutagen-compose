@@ -1,9 +1,13 @@
 package mutagen
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/mutagen-io/mutagen/pkg/grpcutil"
+	"github.com/mutagen-io/mutagen/pkg/selection"
 	synchronizationsvc "github.com/mutagen-io/mutagen/pkg/service/synchronization"
 	"github.com/mutagen-io/mutagen/pkg/synchronization"
 	"github.com/mutagen-io/mutagen/pkg/url"
@@ -82,4 +86,106 @@ func synchronizationSessionCurrent(
 		session.Configuration.Equal(specification.Configuration) &&
 		session.ConfigurationAlpha.Equal(specification.ConfigurationAlpha) &&
 		session.ConfigurationBeta.Equal(specification.ConfigurationBeta)
+}
+
+// synchronizationCreateWithSpecification creates a synchronization session
+// using the provided synchronization service client, session specification, and
+// prompter.
+func synchronizationCreateWithSpecification(
+	ctx context.Context,
+	synchronizationService synchronizationsvc.SynchronizationClient,
+	prompter string,
+	specification *synchronizationsvc.CreationSpecification,
+) (string, error) {
+	response, err := synchronizationService.Create(ctx, &synchronizationsvc.CreateRequest{
+		Prompter:      prompter,
+		Specification: specification,
+	})
+	if err != nil {
+		return "", grpcutil.PeelAwayRPCErrorLayer(err)
+	} else if err = response.EnsureValid(); err != nil {
+		return "", fmt.Errorf("invalid create response received: %w", err)
+	}
+	return response.Session, nil
+}
+
+// synchronizationFlushWithSelection flushes synchronization sessions using the
+// provided synchronization service client, session selection, and prompter.
+func synchronizationFlushWithSelection(
+	ctx context.Context,
+	synchronizationService synchronizationsvc.SynchronizationClient,
+	prompter string,
+	selection *selection.Selection,
+) error {
+	response, err := synchronizationService.Flush(ctx, &synchronizationsvc.FlushRequest{
+		Prompter:  prompter,
+		Selection: selection,
+	})
+	if err != nil {
+		return grpcutil.PeelAwayRPCErrorLayer(err)
+	} else if err = response.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid flush response received: %w", err)
+	}
+	return nil
+}
+
+// synchronizationPauseWithSelection pauses synchronization sessions using the
+// provided synchronization service client, session selection, and prompter.
+func synchronizationPauseWithSelection(
+	ctx context.Context,
+	synchronizationService synchronizationsvc.SynchronizationClient,
+	prompter string,
+	selection *selection.Selection,
+) error {
+	response, err := synchronizationService.Pause(ctx, &synchronizationsvc.PauseRequest{
+		Prompter:  prompter,
+		Selection: selection,
+	})
+	if err != nil {
+		return grpcutil.PeelAwayRPCErrorLayer(err)
+	} else if err = response.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid pause response received: %w", err)
+	}
+	return nil
+}
+
+// synchronizationResumeWithSelection resumes synchronization sessions using the
+// provided synchronization service client, session selection, and prompter.
+func synchronizationResumeWithSelection(
+	ctx context.Context,
+	synchronizationService synchronizationsvc.SynchronizationClient,
+	prompter string,
+	selection *selection.Selection,
+) error {
+	response, err := synchronizationService.Resume(ctx, &synchronizationsvc.ResumeRequest{
+		Prompter:  prompter,
+		Selection: selection,
+	})
+	if err != nil {
+		return grpcutil.PeelAwayRPCErrorLayer(err)
+	} else if err = response.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid resume response received: %w", err)
+	}
+	return nil
+}
+
+// synchronizationTerminateWithSelection terminates synchronization sessions
+// using the provided synchronization service client, session selection, and
+// prompter.
+func synchronizationTerminateWithSelection(
+	ctx context.Context,
+	synchronizationService synchronizationsvc.SynchronizationClient,
+	prompter string,
+	selection *selection.Selection,
+) error {
+	response, err := synchronizationService.Terminate(ctx, &synchronizationsvc.TerminateRequest{
+		Prompter:  prompter,
+		Selection: selection,
+	})
+	if err != nil {
+		return grpcutil.PeelAwayRPCErrorLayer(err)
+	} else if err = response.EnsureValid(); err != nil {
+		return fmt.Errorf("invalid terminate response received: %w", err)
+	}
+	return nil
 }
