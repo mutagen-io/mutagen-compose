@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/spf13/pflag"
+
 	"github.com/docker/cli/cli/command"
 
 	"github.com/docker/docker/client"
@@ -37,6 +39,8 @@ import (
 // single-use type, is not safe for concurrent usage, and its Shutdown method
 // should be invoked when usage is complete.
 type Liaison struct {
+	// dockerFlags are the associated Docker command line flags.
+	dockerFlags *pflag.FlagSet
 	// dockerCLI is the associated Docker CLI instance.
 	dockerCLI command.Cli
 	// composeService is the underlying Compose service.
@@ -47,6 +51,11 @@ type Liaison struct {
 	// synchronization are the synchronization session specifications. This map
 	// is initialized by calling processProject.
 	synchronization map[string]*synchronizationsvc.CreationSpecification
+}
+
+// RegisterDockerFlags registers the associated Docker command line flags.
+func (l *Liaison) RegisterDockerFlags(flags *pflag.FlagSet) {
+	l.dockerFlags = flags
 }
 
 // RegisterDockerCLI registers the associated Docker CLI instance.
@@ -78,9 +87,10 @@ func (l *Liaison) ComposeService() api.Service {
 // processProject loads Mutagen configuration from the specified project, adds
 // the Mutagen Compose sidecar service to the project (as the last service), and
 // sets project dependencies accordingly. If project is nil, this method is a
-// no-op and returns nil. This method must only be called after the associated
-// Docker CLI (registered with RegisterDockerCLI) can return a valid API client
-// via its Client method.
+// no-op and returns nil. This method must only be called after Docker flags
+// have been registered (via RegisterDockerFlags) and the associated Docker CLI
+// (registered via RegisterDockerCLI) can return a valid API client via its
+// Client method.
 func (l *Liaison) processProject(project *types.Project) error {
 	// If the project is nil, then there's nothing to process. In this case,
 	// containers are typically operated on by project name and label selection,
@@ -430,17 +440,16 @@ func (l *Liaison) reconcileSessions(ctx context.Context, sidecarID string) error
 	}()
 
 	// Convert sidecar URLs to concrete Docker URLs and add sidecar ID labels.
-	dockerHost := l.dockerCLI.Client().DaemonHost()
 	for _, specification := range l.forwarding {
-		reifySidecarURLIfNecessary(specification.Source, dockerHost, sidecarID)
-		reifySidecarURLIfNecessary(specification.Destination, dockerHost, sidecarID)
+		reifySidecarURLIfNecessary(specification.Source, l.dockerFlags, l.dockerCLI, sidecarID)
+		reifySidecarURLIfNecessary(specification.Destination, l.dockerFlags, l.dockerCLI, sidecarID)
 		specification.Labels = map[string]string{
 			sessionSidecarLabelKey: chopSidecarIdentifier(sidecarID),
 		}
 	}
 	for _, specification := range l.synchronization {
-		reifySidecarURLIfNecessary(specification.Alpha, dockerHost, sidecarID)
-		reifySidecarURLIfNecessary(specification.Beta, dockerHost, sidecarID)
+		reifySidecarURLIfNecessary(specification.Alpha, l.dockerFlags, l.dockerCLI, sidecarID)
+		reifySidecarURLIfNecessary(specification.Beta, l.dockerFlags, l.dockerCLI, sidecarID)
 		specification.Labels = map[string]string{
 			sessionSidecarLabelKey: chopSidecarIdentifier(sidecarID),
 		}

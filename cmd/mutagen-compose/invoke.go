@@ -52,6 +52,7 @@ func invokeCompose(liaison *mutagen.Liaison) {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
+			liaison.RegisterDockerFlags(cmd.Root().Flags())
 			liaison.RegisterDockerCLI(dockerCli)
 			liaison.RegisterComposeService(compose.NewComposeService(liaison.DockerClient(), dockerCli.ConfigFile()))
 			lazyInit.WithService(liaison.ComposeService())
