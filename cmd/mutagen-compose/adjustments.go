@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
-	"runtime/debug"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -17,7 +15,7 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
 
-	"github.com/mutagen-io/mutagen/pkg/mutagen"
+	versionpkg "github.com/mutagen-io/mutagen-compose/pkg/version"
 )
 
 const (
@@ -124,26 +122,6 @@ func adjustUnknownCommandErrors(cmd *cobra.Command) {
 	}
 }
 
-const (
-	// composeModuleName is the module name that we'll use to identify the
-	// Compose dependency version.
-	composeModuleName = "github.com/docker/compose/v2"
-	// dockerModuleName is the module name that we'll use to identify the Docker
-	// dependency version.
-	dockerModuleName = "github.com/docker/cli"
-)
-
-// versions encodes the dependency versions for Mutagen Compose. It is designed
-// to be serialized as JSON.
-type versions struct {
-	// Compose is the Compose version.
-	Compose string `json:"compose"`
-	// Docker is the Docker version.
-	Docker string `json:"docker"`
-	// Mutagen is the Mutagen version.
-	Mutagen string `json:"mutagen"`
-}
-
 // adjustVersionCommand adjust the behavior of the version command to correspond
 // to Mutagen Compose.
 func adjustVersionCommand(cmd *cobra.Command) {
@@ -169,46 +147,24 @@ func adjustVersionCommand(cmd *cobra.Command) {
 		format := formatFlag.Value.String()
 		short := shortFlag.Value.String() == "true"
 
-		// Create storage for version information.
-		var versions versions
-		versions.Compose = "unknown"
-		versions.Docker = "unknown"
-		versions.Mutagen = mutagen.Version
-
-		// Read build information.
-		build, ok := debug.ReadBuildInfo()
-		if !ok {
-			return errors.New("unable to read build information")
-		}
-
-		// Search for the dependency.
-		var composeFound, dockerFound bool
-		for _, dependency := range build.Deps {
-			if composeFound && dockerFound {
-				break
-			} else if dependency.Path == composeModuleName {
-				versions.Compose = dependency.Version
-				composeFound = true
-			} else if dependency.Path == dockerModuleName {
-				// HACK: The Docker CLI hasn't yet opted-in to Go modules, so
-				// its version will be recorded with a +incompatible tag.
-				versions.Docker = strings.TrimSuffix(dependency.Version, "+incompatible")
-				dockerFound = true
-			}
+		// Load version information.
+		versions, err := versionpkg.LoadVersions()
+		if err != nil {
+			return fmt.Errorf("unable to load version information: %w", err)
 		}
 
 		// Print accordingly. We don't perform any validation on format because
 		// the built-in version command doesn't either.
 		if short {
-			fmt.Printf("%s/%s/%s\n", versions.Compose, versions.Docker, versions.Mutagen)
+			fmt.Printf("%s/%s/%s\n", versions.Mutagen, versions.Compose, versions.Docker)
 			return nil
 		}
 		if format == formatter.JSON {
 			return json.NewEncoder(os.Stdout).Encode(versions)
 		}
+		fmt.Println("Mutagen version", versions.Mutagen)
 		fmt.Println("Compose version", versions.Compose)
 		fmt.Println("Docker version", versions.Docker)
-		fmt.Println("Mutagen version", versions.Mutagen)
 		return nil
 	}
 }

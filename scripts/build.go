@@ -16,7 +16,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/mutagen-io/mutagen/pkg/mutagen"
+	"github.com/mutagen-io/mutagen-compose/pkg/version"
 )
 
 const (
@@ -132,17 +132,11 @@ func (t Target) IncludeInSlimBuildModes() bool {
 
 // Build executes a module-aware build of the specified package URL, storing the
 // output of the build at the specified path.
-func (t Target) Build(url, output string, disableDebug bool) error {
-	// Compute the build command. If we don't need debugging, then we use the -s
-	// and -w linker flags to omit the symbol table and debugging information.
-	// This shaves off about 25% of the binary size and only disables debugging
-	// (stack traces are still intact). For more information, see:
-	// https://blog.filippo.io/shrink-your-go-binaries-with-this-one-weird-trick
-	// In this case, we also trim the code paths stored in the executable, as
-	// there's no use in having the full paths available.
-	arguments := []string{"build", "-o", output}
-	if disableDebug {
-		arguments = append(arguments, "-ldflags=-s -w", "-trimpath")
+func (t Target) Build(url, output string, ldflags string) error {
+	// Compute the build command.
+	arguments := []string{"build", "-o", output, "-trimpath"}
+	if ldflags != "" {
+		arguments = append(arguments, "-ldflags="+ldflags)
 	}
 	arguments = append(arguments, url)
 
@@ -461,16 +455,27 @@ func build() error {
 		activeTargets = append(activeTargets, target)
 	}
 
-	// Determine whether or not to disable debugging information in binaries.
-	// Doing so saves significant space, but is only suited to release builds.
-	disableDebug := mode == "release"
+	// Load version information if necessary.
+	var versions *version.Versions
+	if mode == "release" {
+		versions, err = version.LoadVersions()
+		if err != nil {
+			return fmt.Errorf("unable to load version information: %w", err)
+		}
+	}
+
+	// Compute ldflags.
+	var ldflags string
+	if mode == "release" {
+		ldflags = "-X github.com/docker/compose/v2/internal.Version=" + versions.Compose
+	}
 
 	// Build binaries.
 	log.Println("Building binaries...")
 	for _, target := range activeTargets {
 		log.Println("Build for", target)
 		executableBuildPath := filepath.Join(composeBuildSubdirectoryPath, target.Name())
-		if err := target.Build(composePackage, executableBuildPath, disableDebug); err != nil {
+		if err := target.Build(composePackage, executableBuildPath, ldflags); err != nil {
 			return fmt.Errorf("unable to build Mutagen Compose: %w", err)
 		}
 		if macosCodesignIdentity != "" && target.GOOS == "darwin" {
@@ -491,7 +496,7 @@ func build() error {
 			executableBuildPath := filepath.Join(composeBuildSubdirectoryPath, target.Name())
 			releaseBundlePath := filepath.Join(
 				releaseBuildSubdirectoryPath,
-				fmt.Sprintf("mutagen-compose_%s_v%s.tar.gz", target.Name(), mutagen.Version),
+				fmt.Sprintf("mutagen-compose_%s_v%s.tar.gz", target.Name(), versions.Mutagen),
 			)
 
 			// Build the release bundle.
