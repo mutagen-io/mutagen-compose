@@ -129,5 +129,9 @@ require (
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
-// Custom replacements made by Compose.
-replace github.com/jaguilar/vt100 => github.com/tonistiigi/vt100 v0.0.0-20190402012908-ad4c4a574305
+replace (
+	// Custom replacements made by Compose.
+	github.com/jaguilar/vt100 => github.com/tonistiigi/vt100 v0.0.0-20190402012908-ad4c4a574305
+	// Custom replacements made by Mutagen.
+	k8s.io/apimachinery v0.21.3 => github.com/mutagen-io/apimachinery v0.21.3-mutagen1
+)
