@@ -145,11 +145,19 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// Mutagen into disabled services since we don't want it to be subject to
 	// the user's up operation (but we also don't want it to be flagged as an
 	// orphan service).
+	//
+	// We also have to perform a stop operation on the Mutagen service before
+	// performing the up operation to ensure that session reconciliation occurs
+	// if the service is already running. Fortunately this operation has no
+	// effect or output if the Mutagen service doesn't yet exist, and no effect
+	// if the Mutagen service is already stopped.
 	services := project.Services
 	disabledServices := project.DisabledServices
 	project.Services = services[len(services)-1:]
 	project.DisabledServices = nil
-	if err := s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+	if err := s.service.Stop(ctx, project, api.StopOptions{}); err != nil {
+		return fmt.Errorf("unable to stop Mutagen Compose sidecar service: %w", err)
+	} else if err = s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
 		return fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
 	}
 	project.Services = services[:len(services)-1]
