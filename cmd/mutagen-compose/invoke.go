@@ -70,6 +70,7 @@ func invokeCompose(liaison *mutagen.Liaison) {
 		adjustUsageInformation(cmd)
 		adjustUnknownCommandErrors(cmd)
 		adjustVersionCommand(cmd)
+		cmd.AddCommand(legalCommand)
 		return cmd
 	},
 		manager.Metadata{

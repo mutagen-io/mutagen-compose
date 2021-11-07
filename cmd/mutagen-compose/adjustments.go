@@ -37,6 +37,9 @@ func fauxTopLevelCommandForHelpAndUsage() *cobra.Command {
 	// Adjust the version command like we do for the real command hierarchy.
 	adjustVersionCommand(root)
 
+	// Add the legal command like we do for the real command hierarchy.
+	root.AddCommand(legalCommand)
+
 	// HACK: Set this command up as a Docker plugin root command in order to add
 	// the top-level Docker CLI flags and to set usage formatting. Normally
 	// there would be an intermediate command above this that would be the
