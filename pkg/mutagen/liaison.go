@@ -415,7 +415,6 @@ func (l *Liaison) processProject(project *types.Project) error {
 	}
 
 	// Record the Mutagen service definition.
-	one := "1"
 	l.mutagenService = types.ServiceConfig{
 		Name:  sidecarServiceName,
 		Image: sidecarImage,
@@ -425,9 +424,6 @@ func (l *Liaison) processProject(project *types.Project) error {
 		},
 		Networks: networkDependencies,
 		Volumes:  serviceVolumeDependencies,
-		Environment: types.MappingWithEquals{
-			"MUTAGEN_SIDECAR": &one,
-		},
 	}
 
 	// Store session specifications.
