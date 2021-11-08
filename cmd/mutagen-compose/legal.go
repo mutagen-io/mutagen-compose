@@ -12,7 +12,7 @@ import (
 
 // legalMain is the entry point for the legal command.
 func legalMain(_ *cobra.Command, _ []string) error {
-	// Print legal information.
+	// Print license information.
 	fmt.Println(legal.Licenses)
 
 	// Success.
