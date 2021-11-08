@@ -40,8 +40,20 @@ func (s *composeService) Pull(ctx context.Context, project *types.Project, optio
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
+	// Cache the nominal service list.
+	services := project.Services
+
+	// Inject the Mutagen service into the project.
+	project.Services = append(project.Services, s.liaison.mutagenService)
+
 	// Invoke the underlying implementation.
-	return s.service.Pull(ctx, project, options)
+	result := s.service.Pull(ctx, project, options)
+
+	// Restore the service list.
+	project.Services = services
+
+	// Done.
+	return result
 }
 
 // Create implements github.com/docker/compose/v2/pkg/api.Service.Create.
@@ -51,21 +63,34 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
-	// Create the Mutagen Compose sidecar service first. We do this for
-	// consistency with Up and for the flag-related reasons outlined there (the
-	// hidden start progress updates aren't an issue for create).
+	// Cache the nominal service lists.
 	services := project.Services
 	disabledServices := project.DisabledServices
-	project.Services = services[len(services)-1:]
+
+	// Create the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for the flag-related reasons outlined there (the
+	// hidden start progress updates aren't an issue for Create).
+	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	if err := s.service.Create(ctx, project, api.CreateOptions{IgnoreOrphans: true}); err != nil {
+		project.Services = services
+		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to create Mutagen Compose sidecar service: %w", err)
 	}
-	project.Services = services[:len(services)-1]
-	project.DisabledServices = append(disabledServices, services[len(services)-1])
+
+	// Restore the service lists but keep the Mutagen service defined so that it
+	// doesn't appear as an orphan service.
+	project.Services = services
+	project.DisabledServices = append(disabledServices, s.liaison.mutagenService)
 
 	// Invoke the underlying implementation.
-	return s.service.Create(ctx, project, options)
+	result := s.service.Create(ctx, project, options)
+
+	// Restore the service lists.
+	project.DisabledServices = disabledServices
+
+	// Done.
+	return result
 }
 
 // Start implements github.com/docker/compose/v2/pkg/api.Service.Start.
@@ -75,18 +100,26 @@ func (s *composeService) Start(ctx context.Context, project *types.Project, opti
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
-	// Start the Mutagen Compose sidecar service first. We do this for
-	// consistency with Up and for the flag-related reasons outlined there (the
-	// hidden start progress updates aren't an issue for start).
+	// Cache the nominal service lists.
 	services := project.Services
 	disabledServices := project.DisabledServices
-	project.Services = services[len(services)-1:]
+
+	// Start the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for the flag-related reasons outlined there (the
+	// hidden start progress updates aren't an issue for Start).
+	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	if err := s.service.Start(ctx, project, api.StartOptions{}); err != nil {
+		project.Services = services
+		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)
 	}
-	project.Services = services[:len(services)-1]
-	project.DisabledServices = append(disabledServices, services[len(services)-1])
+
+	// Restore the service lists. Unlike Create and Up, we don't need to keep
+	// Mutagen defined as a disabled service here because Start doesn't care
+	// about orphan services.
+	project.Services = services
+	project.DisabledServices = disabledServices
 
 	// Invoke the underlying implementation.
 	return s.service.Start(ctx, project, options)
@@ -104,8 +137,20 @@ func (s *composeService) Stop(ctx context.Context, project *types.Project, optio
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
+	// Cache the nominal service list.
+	services := project.Services
+
+	// Inject the Mutagen service into the project.
+	project.Services = append(project.Services, s.liaison.mutagenService)
+
 	// Invoke the underlying implementation.
-	return s.service.Stop(ctx, project, options)
+	result := s.service.Stop(ctx, project, options)
+
+	// Restore the service list.
+	project.Services = services
+
+	// Done.
+	return result
 }
 
 // Up implements github.com/docker/compose/v2/pkg/api.Service.Up.
@@ -114,6 +159,10 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
 	}
+
+	// Cache the nominal service lists.
+	services := project.Services
+	disabledServices := project.DisabledServices
 
 	// Bring up the Mutagen Compose sidecar service first. We do this for two
 	// reasons: First, we don't want user-specified up flags (which might be
@@ -136,35 +185,43 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// networks, for example, are always created when any service starts,
 	// regardless of whether or not it depends on them).
 	//
-	// To do this, we'll need to temporarily filter the service lists to include
+	// To do this, we'll need to temporarily modify the service lists to include
 	// only the Mutagen service, because although the underlying create call
 	// will filter services if a list is specified in the create options, the
 	// underlying start call has no such option field. In this case, we'll tell
 	// the up operation to ignore orphans, since all other services at that
-	// point would be orphans. After that, we'll restore the service lists and
-	// Mutagen into disabled services since we don't want it to be subject to
-	// the user's up operation (but we also don't want it to be flagged as an
-	// orphan service).
+	// point would be orphans.
 	//
 	// We also have to perform a stop operation on the Mutagen service before
 	// performing the up operation to ensure that session reconciliation occurs
 	// if the service is already running. Fortunately this operation has no
 	// effect or output if the Mutagen service doesn't yet exist, and no effect
 	// if the Mutagen service is already stopped.
-	services := project.Services
-	disabledServices := project.DisabledServices
-	project.Services = services[len(services)-1:]
+	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	if err := s.service.Stop(ctx, project, api.StopOptions{}); err != nil {
+		project.Services = services
+		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to stop Mutagen Compose sidecar service: %w", err)
 	} else if err = s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+		project.Services = services
+		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
 	}
-	project.Services = services[:len(services)-1]
-	project.DisabledServices = append(disabledServices, services[len(services)-1])
+
+	// Restore the service lists but keep the Mutagen service defined so that it
+	// doesn't appear as an orphan service.
+	project.Services = services
+	project.DisabledServices = append(disabledServices, s.liaison.mutagenService)
 
 	// Invoke the underlying implementation.
-	return s.service.Up(ctx, project, options)
+	result := s.service.Up(ctx, project, options)
+
+	// Restore the service lists.
+	project.DisabledServices = disabledServices
+
+	// Done.
+	return result
 }
 
 // Down implements github.com/docker/compose/v2/pkg/api.Service.Down.
@@ -174,8 +231,24 @@ func (s *composeService) Down(ctx context.Context, projectName string, options a
 		return fmt.Errorf("unable to process project: %w", err)
 	}
 
+	// Cache the nominal service list and inject the Mutagen service definition
+	// if the project is non-nil.
+	var services types.Services
+	if options.Project != nil {
+		services = options.Project.Services
+		options.Project.Services = append(options.Project.Services, s.liaison.mutagenService)
+	}
+
 	// Invoke the underlying implementation.
-	return s.service.Down(ctx, projectName, options)
+	result := s.service.Down(ctx, projectName, options)
+
+	// Restore the service list if the project is non-nil.
+	if options.Project != nil {
+		options.Project.Services = services
+	}
+
+	// Done.
+	return result
 }
 
 // Logs implements github.com/docker/compose/v2/pkg/api.Service.Logs.
@@ -231,17 +304,25 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 		return 0, fmt.Errorf("unable to process project: %w", err)
 	}
 
-	// Bring up the Mutagen Compose sidecar service first. We do this for
-	// consistency with Up and for reasons outlined there.
+	// Cache the nominal service lists.
 	services := project.Services
 	disabledServices := project.DisabledServices
-	project.Services = services[len(services)-1:]
+
+	// Bring up the Mutagen Compose sidecar service first. We do this for
+	// consistency with Up and for reasons outlined there.
+	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	if err := s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+		project.Services = services
+		project.DisabledServices = disabledServices
 		return 0, fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
 	}
-	project.Services = services[:len(services)-1]
-	project.DisabledServices = append(disabledServices, services[len(services)-1])
+
+	// Restore the service lists. Unlike Create and Up, we don't need to keep
+	// Mutagen defined as a disabled service here because RunOneOffContainer
+	// doesn't care about orphan services.
+	project.Services = services
+	project.DisabledServices = disabledServices
 
 	// Invoke the underlying implementation.
 	return s.service.RunOneOffContainer(ctx, project, options)

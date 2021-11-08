@@ -45,6 +45,12 @@ type Liaison struct {
 	dockerCLI command.Cli
 	// composeService is the underlying Compose service.
 	composeService api.Service
+	// processedProject indicates whether or not a project has already been
+	// processed.
+	processedProject bool
+	// mutagenService is the Mutagen Compose sidecar service definition. It is
+	// initialized by calling processProject.
+	mutagenService types.ServiceConfig
 	// forwarding are the forwarding session specifications. This map is
 	// initialized by calling processProject.
 	forwarding map[string]*forwardingsvc.CreationSpecification
@@ -90,8 +96,15 @@ func (l *Liaison) ComposeService() api.Service {
 // no-op and returns nil. This method must only be called after Docker flags
 // have been registered (via RegisterDockerFlags) and the associated Docker CLI
 // (registered via RegisterDockerCLI) can return a valid API client via its
-// Client method.
+// Client method. Only the first call to this method has any effect; all
+// subsequent calls are no-ops and return nil.
 func (l *Liaison) processProject(project *types.Project) error {
+	// If a project has already been processed, then we're done.
+	if l.processedProject {
+		return nil
+	}
+	l.processedProject = true
+
 	// If the project is nil, then there's nothing to process. In this case,
 	// containers are typically operated on by project name and label selection,
 	// so there's no need to modify the project because the Mutagen sidecar
@@ -401,8 +414,9 @@ func (l *Liaison) processProject(project *types.Project) error {
 		})
 	}
 
-	// Add the Mutagen service definition.
-	project.Services = append(project.Services, types.ServiceConfig{
+	// Record the Mutagen service definition.
+	one := "1"
+	l.mutagenService = types.ServiceConfig{
 		Name:  sidecarServiceName,
 		Image: sidecarImage,
 		Labels: types.Labels{
@@ -411,8 +425,10 @@ func (l *Liaison) processProject(project *types.Project) error {
 		},
 		Networks: networkDependencies,
 		Volumes:  serviceVolumeDependencies,
-		// TODO: Set sidecar context environment variable.
-	})
+		Environment: types.MappingWithEquals{
+			"MUTAGEN_SIDECAR": &one,
+		},
+	}
 
 	// Store session specifications.
 	l.forwarding = forwardingSpecifications
