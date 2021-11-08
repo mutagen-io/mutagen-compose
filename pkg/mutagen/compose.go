@@ -299,32 +299,6 @@ func (s *composeService) Kill(ctx context.Context, project *types.Project, optio
 // RunOneOffContainer implements
 // github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
 func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.Project, options api.RunOptions) (int, error) {
-	// Process Mutagen extensions for the project.
-	if err := s.liaison.processProject(project); err != nil {
-		return 0, fmt.Errorf("unable to process project: %w", err)
-	}
-
-	// Cache the nominal service lists.
-	services := project.Services
-	disabledServices := project.DisabledServices
-
-	// Bring up the Mutagen Compose sidecar service first. We do this for
-	// consistency with Up and for reasons outlined there.
-	project.Services = types.Services{s.liaison.mutagenService}
-	project.DisabledServices = nil
-	if err := s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
-		project.Services = services
-		project.DisabledServices = disabledServices
-		return 0, fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
-	}
-
-	// Restore the service lists. Unlike Create and Up, we don't need to keep
-	// Mutagen defined as a disabled service here because RunOneOffContainer
-	// doesn't care about orphan services.
-	project.Services = services
-	project.DisabledServices = disabledServices
-
-	// Invoke the underlying implementation.
 	return s.service.RunOneOffContainer(ctx, project, options)
 }
 
