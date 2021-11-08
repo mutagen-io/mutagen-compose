@@ -140,8 +140,12 @@ func (s *composeService) Stop(ctx context.Context, project *types.Project, optio
 	// Cache the nominal service list.
 	services := project.Services
 
-	// Inject the Mutagen service into the project.
-	project.Services = append(project.Services, s.liaison.mutagenService)
+	// Inject the Mutagen service into the project, but only if no services have
+	// been specified explictly (meaning that all services should be stopped,
+	// including the Mutagen service).
+	if len(options.Services) == 0 {
+		project.Services = append(project.Services, s.liaison.mutagenService)
+	}
 
 	// Invoke the underlying implementation.
 	result := s.service.Stop(ctx, project, options)
