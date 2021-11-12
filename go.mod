@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/compose-spec/compose-go v1.0.5
 	github.com/docker/cli v20.10.7+incompatible
-	github.com/docker/compose/v2 v2.1.0
+	github.com/docker/compose/v2 v2.1.1
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mutagen-io/mutagen v0.13.0-beta2
