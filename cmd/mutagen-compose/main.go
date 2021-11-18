@@ -6,10 +6,17 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/mutagen-io/mutagen/cmd/external"
+
 	"github.com/mutagen-io/mutagen-compose/pkg/compose"
 	"github.com/mutagen-io/mutagen-compose/pkg/docker"
 	"github.com/mutagen-io/mutagen-compose/pkg/mutagen"
 )
+
+func init() {
+	// Set flags for invoking Mutagen cmd packages externally.
+	external.UsePathBasedLookupForDaemonStart = true
+}
 
 func main() {
 	// Create storage for top-level Docker and Compose flags.

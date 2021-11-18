@@ -819,8 +819,8 @@ github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 h1:PYeqqury0vV
 github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434/go.mod h1:kmTyqetTEgYl9KF5JlHLKL6LXnhs2/oK5100pcMZRn8=
 github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 h1:0PaUmAw6e54jseSG0ob2U9P1p6p+Sppw3sanphmM4LY=
 github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7/go.mod h1:MyZ/hSGB6tVRgiUqOL62QdM31Sy+B8hvbA1roNTHmOc=
-github.com/mutagen-io/mutagen v0.13.0-beta2 h1:yTvrXu+KCasl6Po+amLkW4G/6Jz0YYGqmt+NIZTBubw=
-github.com/mutagen-io/mutagen v0.13.0-beta2/go.mod h1:xHlz5zlh/K0j0SLMv/ZC5Qif2mBVOsmfsw1J8sNY9f0=
+github.com/mutagen-io/mutagen v0.13.0-beta2.0.20211118004113-238261c20287 h1:7sIfj2YaCoe0lIRQmtqXt6GT5L19Aw2nUC6Qstp3fO4=
+github.com/mutagen-io/mutagen v0.13.0-beta2.0.20211118004113-238261c20287/go.mod h1:xHlz5zlh/K0j0SLMv/ZC5Qif2mBVOsmfsw1J8sNY9f0=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
 github.com/ncw/swift v1.0.47/go.mod h1:23YIA4yWVnGwv2dQlN4bB7egfYX6YLn0Yo/S6zZO/ZM=
