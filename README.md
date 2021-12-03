@@ -14,7 +14,7 @@ bind mounts.
 ## Usage
 
 Check out the
-[Mutagen Compose documentation](https://mutagen.io/documentation/orchestration/compose-v2)
+[Mutagen Compose documentation](https://mutagen.io/documentation/orchestration/compose)
 for usage information.
 
 
