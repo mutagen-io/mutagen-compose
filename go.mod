@@ -3,9 +3,9 @@ module github.com/mutagen-io/mutagen-compose
 go 1.17
 
 require (
-	github.com/compose-spec/compose-go v1.0.5
+	github.com/compose-spec/compose-go v1.0.8
 	github.com/docker/cli v20.10.7+incompatible
-	github.com/docker/compose/v2 v2.1.1
+	github.com/docker/compose/v2 v2.2.2
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/mutagen-io/mutagen v0.13.0-beta3
@@ -18,7 +18,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
-	github.com/Microsoft/hcsshim v0.8.18 // indirect
+	github.com/Microsoft/hcsshim v0.8.23 // indirect
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.0.2 // indirect
@@ -26,10 +26,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cnabio/cnab-go v0.10.0-beta1 // indirect
 	github.com/cnabio/cnab-to-oci v0.3.1-beta1 // indirect
-	github.com/compose-spec/godotenv v1.1.0 // indirect
+	github.com/compose-spec/godotenv v1.1.1 // indirect
 	github.com/containerd/cgroups v1.0.1 // indirect
 	github.com/containerd/console v1.0.2 // indirect
-	github.com/containerd/containerd v1.5.5 // indirect
+	github.com/containerd/containerd v1.5.8 // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
 	github.com/containerd/typeurl v1.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -88,8 +88,8 @@ require (
 	github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 // indirect
 	github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.0.1 // indirect
-	github.com/opencontainers/runc v1.0.1 // indirect
+	github.com/opencontainers/image-spec v1.0.2 // indirect
+	github.com/opencontainers/runc v1.0.2 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.7.1 // indirect
