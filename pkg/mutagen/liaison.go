@@ -138,19 +138,19 @@ func (l *Liaison) processProject(project *types.Project) error {
 	// the "down" operation, where, in the event that someone had deleted the
 	// x-mutagen extension section after running "up", the Mutagen sidecar
 	// service would be seen as an orphan container.
-	sessions := &configuration{}
-	if xMutagen, ok := project.Extensions["x-mutagen"]; ok {
+	xMutagen := &configuration{}
+	if x, ok := project.Extensions["x-mutagen"]; ok {
 		decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 			DecodeHook: mapstructure.ComposeDecodeHookFunc(
 				mapstructure.TextUnmarshallerHookFunc(),
 				boolToIgnoreVCSModeHookFunc(),
 			),
 			ErrorUnused: true,
-			Result:      sessions,
+			Result:      xMutagen,
 		})
 		if err != nil {
 			return fmt.Errorf("unable to create configuration decoder: %w", err)
-		} else if err = decoder.Decode(xMutagen); err != nil {
+		} else if err = decoder.Decode(x); err != nil {
 			return fmt.Errorf("unable to decode x-mutagen section: %w", err)
 		}
 	}
@@ -159,7 +159,7 @@ func (l *Liaison) processProject(project *types.Project) error {
 	defaultConfigurationForwarding := &forwarding.Configuration{}
 	defaultConfigurationSource := &forwarding.Configuration{}
 	defaultConfigurationDestination := &forwarding.Configuration{}
-	if defaults, ok := sessions.Forwarding["defaults"]; ok {
+	if defaults, ok := xMutagen.Forwarding["defaults"]; ok {
 		if defaults.Source != "" {
 			return errors.New("source URL not allowed in default forwarding configuration")
 		} else if defaults.Destination != "" {
@@ -177,14 +177,14 @@ func (l *Liaison) processProject(project *types.Project) error {
 		if err := defaultConfigurationDestination.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default forwarding destination configuration: %w", err)
 		}
-		delete(sessions.Forwarding, "defaults")
+		delete(xMutagen.Forwarding, "defaults")
 	}
 
 	// Extract and validate synchronization defaults.
 	defaultConfigurationSynchronization := &synchronization.Configuration{}
 	defaultConfigurationAlpha := &synchronization.Configuration{}
 	defaultConfigurationBeta := &synchronization.Configuration{}
-	if defaults, ok := sessions.Synchronization["defaults"]; ok {
+	if defaults, ok := xMutagen.Synchronization["defaults"]; ok {
 		if defaults.Alpha != "" {
 			return errors.New("alpha URL not allowed in default synchronization configuration")
 		} else if defaults.Beta != "" {
@@ -202,14 +202,14 @@ func (l *Liaison) processProject(project *types.Project) error {
 		if err := defaultConfigurationBeta.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default synchronization beta configuration: %w", err)
 		}
-		delete(sessions.Synchronization, "defaults")
+		delete(xMutagen.Synchronization, "defaults")
 	}
 
 	// Validate forwarding configurations, convert them to session creation
 	// specifications, and extract network dependencies for the Mutagen service.
 	forwardingSpecifications := make(map[string]*forwardingsvc.CreationSpecification)
 	networkDependencies := make(map[string]*types.ServiceNetworkConfig)
-	for name, session := range sessions.Forwarding {
+	for name, session := range xMutagen.Forwarding {
 		// Verify that the name is valid.
 		if err := selection.EnsureNameValid(name); err != nil {
 			return fmt.Errorf("invalid forwarding session name (%s): %w", name, err)
@@ -290,7 +290,7 @@ func (l *Liaison) processProject(project *types.Project) error {
 	// specifications, and extract volume dependencies for the Mutagen service.
 	synchronizationSpecifications := make(map[string]*synchronizationsvc.CreationSpecification)
 	volumeDependencies := make(map[string]bool)
-	for name, session := range sessions.Synchronization {
+	for name, session := range xMutagen.Synchronization {
 		// Verify that the name is valid.
 		if err := selection.EnsureNameValid(name); err != nil {
 			return fmt.Errorf("invalid synchronization session name (%s): %v", name, err)
@@ -414,7 +414,7 @@ func (l *Liaison) processProject(project *types.Project) error {
 		})
 	}
 
-	// Record the Mutagen service definition.
+	// Create and record the Mutagen sidecar service definition.
 	l.mutagenService = types.ServiceConfig{
 		Name:  sidecarServiceName,
 		Image: sidecarImage,
@@ -424,6 +424,15 @@ func (l *Liaison) processProject(project *types.Project) error {
 		},
 		Networks: networkDependencies,
 		Volumes:  serviceVolumeDependencies,
+		Restart:  types.RestartPolicyUnlessStopped,
+	}
+
+	// Process sidecar configuration overrides.
+	if xMutagen.Sidecar.Restart != "" {
+		if !isValidRestartPolicy(xMutagen.Sidecar.Restart) {
+			return fmt.Errorf("invalid restart policy specification: %s", xMutagen.Sidecar.Restart)
+		}
+		l.mutagenService.Restart = xMutagen.Sidecar.Restart
 	}
 
 	// Store session specifications.

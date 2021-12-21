@@ -5,6 +5,12 @@ import (
 	"github.com/mutagen-io/mutagen/pkg/configuration/synchronization"
 )
 
+// sidecarConfiguration encodes sidecar service configuration.
+type sidecarConfiguration struct {
+	// Restart is the restart policy for the sidecar container.
+	Restart string `yaml:"restart"`
+}
+
 // forwardingConfiguration encodes a forwarding session specification.
 type forwardingConfiguration struct {
 	// Source is the source URL for the session.
@@ -37,6 +43,8 @@ type synchronizationConfiguration struct {
 // configuration encodes collections of Mutagen forwarding and synchronization
 // sessions found under an "x-mutagen" extension field.
 type configuration struct {
+	// Sidecar represents the sidecar service configuration.
+	Sidecar sidecarConfiguration `yaml:"sidecar"`
 	// Forwarding represents the forwarding sessions to be created. If a
 	// "defaults" key is present, it is treated as a template upon which other
 	// configurations are layered, thus keeping syntactic compatibility with the

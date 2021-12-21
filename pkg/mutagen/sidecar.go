@@ -7,6 +7,8 @@ import (
 
 	"github.com/docker/cli/cli/command"
 
+	"github.com/compose-spec/compose-go/types"
+
 	"github.com/mutagen-io/mutagen/pkg/mutagen"
 	"github.com/mutagen-io/mutagen/pkg/sidecar"
 	"github.com/mutagen-io/mutagen/pkg/url"
@@ -129,4 +131,13 @@ func reifySidecarURLIfNecessary(target *url.URL, dockerFlags *pflag.FlagSet, doc
 			target.Parameters["config"] = configFlag.Value.String()
 		}
 	}
+}
+
+// isValidRestartPolicy returns true if and only if the provided restart policy
+// is non-empty and names a valid restart policy.
+func isValidRestartPolicy(restart string) bool {
+	return restart == types.RestartPolicyAlways ||
+		restart == types.RestartPolicyOnFailure ||
+		restart == types.RestartPolicyNo ||
+		restart == types.RestartPolicyUnlessStopped
 }
