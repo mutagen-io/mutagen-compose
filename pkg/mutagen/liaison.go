@@ -424,7 +424,6 @@ func (l *Liaison) processProject(project *types.Project) error {
 		},
 		Networks: networkDependencies,
 		Volumes:  serviceVolumeDependencies,
-		Restart:  types.RestartPolicyUnlessStopped,
 	}
 
 	// Process sidecar configuration overrides.
