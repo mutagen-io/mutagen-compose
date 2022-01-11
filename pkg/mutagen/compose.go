@@ -317,7 +317,7 @@ func (s *composeService) Exec(ctx context.Context, projectName string, options a
 }
 
 // Copy implements github.com/docker/compose/v2/pkg/api.Service.Copy.
-func (s *composeService) Copy(ctx context.Context, project *types.Project, options api.CopyOptions) error {
+func (s *composeService) Copy(ctx context.Context, project string, options api.CopyOptions) error {
 	return s.service.Copy(ctx, project, options)
 }
 
