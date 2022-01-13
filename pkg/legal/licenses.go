@@ -4,7 +4,7 @@ package legal
 // dependencies.
 const Licenses = `Mutagen Compose
 
-Copyright (c) 2020 - 2021 Mutagen IO, Inc.
+Copyright (c) 2020 - 2022 Mutagen IO, Inc.
 
 Licensed under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
@@ -18,7 +18,7 @@ Mutagen
 
 https://github.com/mutagen-io/mutagen
 
-Copyright (c) 2016 - 2021 Mutagen IO, Inc.
+Copyright (c) 2016 - 2022 Mutagen IO, Inc.
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
