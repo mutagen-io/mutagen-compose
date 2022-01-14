@@ -225,7 +225,6 @@ github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1/go.mod h1:eXthEFrGJvWH
 github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
 github.com/cockroachdb/datadriven v0.0.0-20190809214429-80d97fb3cbaa/go.mod h1:zn76sxSg3SzpJ0PPJaLDCu+Bu0Lg3sKTORVIj19EIF8=
 github.com/codahale/hdrhistogram v0.0.0-20160425231609-f8ad88b59a58/go.mod h1:sE/e/2PUdi/liOCUjSTXgM1o87ZssimdTWN964YiIeI=
-github.com/compose-spec/compose-go v0.0.0-20210322090015-6166d06f9ce2/go.mod h1:6eIT9U2OgdHmkRD6szmqatCrWWEEUSwl/j2iJYH4jLo=
 github.com/compose-spec/compose-go v1.0.9-0.20220101154228-91ed80f52afe h1:eBklPN+uwonUSLAXWHDsyIOY0V4dVgE0YZOcIfXt5sc=
 github.com/compose-spec/compose-go v1.0.9-0.20220101154228-91ed80f52afe/go.mod h1:oCDjpdV9PA3EGSXw278816A+t8B7U5c7/16iLdRyMpk=
 github.com/compose-spec/godotenv v1.1.1 h1:lp+WpAInnw06YN9sV/XLUOV/9z4C+6wjJdWlrdVac7o=
@@ -737,7 +736,6 @@ github.com/jmespath/go-jmespath v0.0.0-20160803190731-bd40a432e4c7/go.mod h1:Nht
 github.com/jmespath/go-jmespath v0.3.0/go.mod h1:9QtRXoHjLGCJ5IBSaohpXITPlowMeeYCZ7fLUTSywik=
 github.com/jmhodges/clock v0.0.0-20160418191101-880ee4c33548/go.mod h1:hGT6jSUVzF6no3QaDSMLGLEHtHSBSefs+MgcDWnmhmo=
 github.com/jmoiron/sqlx v0.0.0-20180124204410-05cef0741ade/go.mod h1:IiEW3SEiiErVyFdH8NTuWjSifiEQKUoyK3LNqr2kCHU=
-github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/json-iterator/go v0.0.0-20180612202835-f2b4162afba3/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v0.0.0-20180701071628-ab8a2e0c74be/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
@@ -815,7 +813,6 @@ github.com/mattn/go-isatty v0.0.14 h1:yVuAays6BHfxijgZPzw+3Zlu5yQgKGP2/hcQbHb7S9
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mattn/go-runewidth v0.0.2/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/mattn/go-shellwords v1.0.3/go.mod h1:3xCvwCdWdlDJUrvuMn7Wuy9eWs4pE8vqg+NOMyg4B2o=
-github.com/mattn/go-shellwords v1.0.11/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lLtQsUlTZDWQ8Y=
 github.com/mattn/go-shellwords v1.0.12 h1:M2zGm7EW6UQJvDeQxo4T51eKPurbeFbe8WtebGE2xrk=
 github.com/mattn/go-shellwords v1.0.12/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lLtQsUlTZDWQ8Y=
 github.com/mattn/go-sqlite3 v1.10.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
@@ -888,8 +885,8 @@ github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 h1:PYeqqury0vV
 github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434/go.mod h1:kmTyqetTEgYl9KF5JlHLKL6LXnhs2/oK5100pcMZRn8=
 github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7 h1:0PaUmAw6e54jseSG0ob2U9P1p6p+Sppw3sanphmM4LY=
 github.com/mutagen-io/gopass v0.0.0-20170602182606-9a121bec1ae7/go.mod h1:MyZ/hSGB6tVRgiUqOL62QdM31Sy+B8hvbA1roNTHmOc=
-github.com/mutagen-io/mutagen v0.13.0-beta4 h1:YzX04o6vOnwJgK3FV+oRRBdK+wa8ju/bqUbLbCQv6iA=
-github.com/mutagen-io/mutagen v0.13.0-beta4/go.mod h1:QQGchuapiAqkJQFYjYfgaYgjC5RjYfvL1ykXJXHTzrU=
+github.com/mutagen-io/mutagen v0.13.0 h1:vIaqzEhJ7ga6OoSYLFW9/wpT7UBB0Rf7y1o7MPVz/p8=
+github.com/mutagen-io/mutagen v0.13.0/go.mod h1:2gQVuBFo9OoGOcfR6krW8899IH9ndGO8eNYgg53S8lg=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
 github.com/ncw/swift v1.0.47/go.mod h1:23YIA4yWVnGwv2dQlN4bB7egfYX6YLn0Yo/S6zZO/ZM=

@@ -8,7 +8,7 @@ require (
 	github.com/docker/compose/v2 v2.2.3
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/mitchellh/mapstructure v1.4.3
-	github.com/mutagen-io/mutagen v0.13.0-beta4
+	github.com/mutagen-io/mutagen v0.13.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 )
