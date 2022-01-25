@@ -39,7 +39,7 @@ available in your path.
 
 The best way to install Mutagen Compose is via Homebrew using:
 
-    brew install mutagen-io/mutagen/mutagen-compose-beta
+    brew install mutagen-io/mutagen/mutagen-compose
 
 Alternatively, you can download the
 [official release binary](https://github.com/mutagen-io/mutagen-compose/releases)
