@@ -263,24 +263,22 @@ func (s *composeService) Logs(ctx context.Context, projectName string, consumer 
 
 // Ps implements github.com/docker/compose/v2/pkg/api.Service.Ps.
 func (s *composeService) Ps(ctx context.Context, projectName string, options api.PsOptions) ([]api.ContainerSummary, error) {
-	if os.Getenv("MUTAGEN_COMPOSE_DISABLE_SESSION_LISTING") != "1" {
-		// Perform a query to identify the Mutagen Compose sidecar container. We
-		// allow it to not exist, but we don't allow multiple matches.
-		containers, err := s.liaison.dockerCLI.Client().ContainerList(ctx, moby.ContainerListOptions{
-			Filters: filters.NewArgs(
-				filters.Arg("label", fmt.Sprintf("%s=%s", api.ProjectLabel, projectName)),
-				filters.Arg("label", fmt.Sprintf("%s=%s", sidecarRoleLabelKey, sidecarRoleLabelValue)),
-			),
-			All: true,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("unable to query Mutagen sidecar container: %w", err)
-		} else if len(containers) > 1 {
-			return nil, errors.New("multiple Mutagen sidecar containers identified")
-		} else if len(containers) == 1 {
-			if err := s.liaison.listSessions(ctx, containers[0].ID); err != nil {
-				return nil, err
-			}
+	// Perform a query to identify the Mutagen Compose sidecar container. We
+	// allow it to not exist, but we don't allow multiple matches.
+	containers, err := s.liaison.dockerCLI.Client().ContainerList(ctx, moby.ContainerListOptions{
+		Filters: filters.NewArgs(
+			filters.Arg("label", fmt.Sprintf("%s=%s", api.ProjectLabel, projectName)),
+			filters.Arg("label", fmt.Sprintf("%s=%s", sidecarRoleLabelKey, sidecarRoleLabelValue)),
+		),
+		All: true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("unable to query Mutagen sidecar container: %w", err)
+	} else if len(containers) > 1 {
+		return nil, errors.New("multiple Mutagen sidecar containers identified")
+	} else if len(containers) == 1 && os.Getenv("MUTAGEN_COMPOSE_DISABLE_SESSION_LISTING") != "1" {
+		if err := s.liaison.listSessions(ctx, containers[0].ID); err != nil {
+			return nil, err
 		}
 	}
 
