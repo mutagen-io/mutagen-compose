@@ -9,11 +9,14 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/docker/cli/cli"
+	"github.com/docker/cli/cli/command"
 
 	commands "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/cmd/formatter"
 	"github.com/docker/compose/v2/pkg/api"
 	"github.com/docker/compose/v2/pkg/compose"
+
+	"github.com/mutagen-io/mutagen/cmd"
 
 	versionpkg "github.com/mutagen-io/mutagen-compose/pkg/version"
 )
@@ -29,8 +32,15 @@ const (
 // whose help and usage information will include merged-in top-level Docker CLI
 // flags supported by Mutagen Compose.
 func fauxTopLevelCommandForHelpAndUsage() *cobra.Command {
+	// Create a Docker CLI to use for the top-level Compose command. We use the
+	// same construction as github.com/docker/cli/cli-plugins/plugin.Run.
+	dockerCli, err := command.NewDockerCli()
+	if err != nil {
+		cmd.Fatal(err)
+	}
+
 	// Create a top-level Compose command and replace its command name.
-	root := commands.RootCommand(api.NewServiceProxy())
+	root := commands.RootCommand(dockerCli, api.NewServiceProxy())
 	root.Use = commandName
 	root.Short = commandDescription
 

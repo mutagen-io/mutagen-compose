@@ -59,21 +59,33 @@ type Liaison struct {
 	synchronization map[string]*synchronizationsvc.CreationSpecification
 }
 
-// RegisterDockerFlags registers the associated Docker command line flags.
-func (l *Liaison) RegisterDockerFlags(flags *pflag.FlagSet) {
-	l.dockerFlags = flags
-}
-
 // RegisterDockerCLI registers the associated Docker CLI instance.
 func (l *Liaison) RegisterDockerCLI(cli command.Cli) {
 	l.dockerCLI = cli
 }
 
-// DockerClient returns a Mutagen-aware version of the Docker API client. This
-// method must only be called after the associated Docker CLI (registered with
-// RegisterDockerCLI) can return a valid API client via its Client method.
-func (l *Liaison) DockerClient() client.APIClient {
-	return &dockerAPIClient{l, l.dockerCLI.Client()}
+// RegisterDockerFlags registers the associated Docker command line flags.
+func (l *Liaison) RegisterDockerFlags(flags *pflag.FlagSet) {
+	l.dockerFlags = flags
+}
+
+// dockerCLI is a Mutagen-aware Docker CLI implementation.
+type dockerCLI struct {
+	// Cli is the underlying Docker CLI.
+	command.Cli
+	// liaison is the parent Mutagen liaison.
+	liaison *Liaison
+}
+
+// Client returns a Mutagen-aware Docker API client.
+func (c *dockerCLI) Client() client.APIClient {
+	return &dockerAPIClient{c.liaison, c.Cli.Client()}
+}
+
+// DockerCLI returns a Mutagen-aware version of the Docker CLI. This method must
+// only be calld after the underlying CLI is registered via RegisterDockerCLI.
+func (l *Liaison) DockerCLI() command.Cli {
+	return &dockerCLI{l.dockerCLI, l}
 }
 
 // RegisterComposeService registers the underlying Compose service. The Compose

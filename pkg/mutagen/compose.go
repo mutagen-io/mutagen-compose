@@ -13,6 +13,16 @@ import (
 	"github.com/docker/compose/v2/pkg/api"
 )
 
+// appendServiceByCopy appends a service definition to a slice of service
+// definitions without any risk of overwriting additional capacity in the slice
+// that might be in use elsewhere.
+func appendServiceByCopy(services types.Services, service types.ServiceConfig) types.Services {
+	result := make(types.Services, 0, len(services)+1)
+	result = append(result, services...)
+	result = append(result, service)
+	return result
+}
+
 // composeService is a Mutagen-aware implementation of
 // github.com/docker/compose/v2/pkg/api.Service that injects Mutagen services
 // and dependencies into the project.
@@ -44,7 +54,7 @@ func (s *composeService) Pull(ctx context.Context, project *types.Project, optio
 	services := project.Services
 
 	// Inject the Mutagen service into the project.
-	project.Services = append(project.Services, s.liaison.mutagenService)
+	project.Services = appendServiceByCopy(project.Services, s.liaison.mutagenService)
 
 	// Invoke the underlying implementation.
 	result := s.service.Pull(ctx, project, options)
@@ -81,7 +91,7 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 	// Restore the service lists but keep the Mutagen service defined so that it
 	// doesn't appear as an orphan service.
 	project.Services = services
-	project.DisabledServices = append(disabledServices, s.liaison.mutagenService)
+	project.DisabledServices = appendServiceByCopy(disabledServices, s.liaison.mutagenService)
 
 	// Invoke the underlying implementation.
 	result := s.service.Create(ctx, project, options)
@@ -94,67 +104,29 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 }
 
 // Start implements github.com/docker/compose/v2/pkg/api.Service.Start.
-func (s *composeService) Start(ctx context.Context, project *types.Project, options api.StartOptions) error {
-	// Process Mutagen extensions for the project.
-	if err := s.liaison.processProject(project); err != nil {
-		return fmt.Errorf("unable to process project: %w", err)
-	}
-
-	// Cache the nominal service lists.
-	services := project.Services
-	disabledServices := project.DisabledServices
-
+func (s *composeService) Start(ctx context.Context, projectName string, options api.StartOptions) error {
 	// Start the Mutagen Compose sidecar service first. We do this for
 	// consistency with Up and for the flag-related reasons outlined there (the
 	// hidden start progress updates aren't an issue for Start).
-	project.Services = types.Services{s.liaison.mutagenService}
-	project.DisabledServices = nil
-	if err := s.service.Start(ctx, project, api.StartOptions{}); err != nil {
-		project.Services = services
-		project.DisabledServices = disabledServices
+	mutagenStartOptions := api.StartOptions{
+		AttachTo: []string{sidecarServiceName},
+	}
+	if err := s.service.Start(ctx, projectName, mutagenStartOptions); err != nil {
 		return fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)
 	}
 
-	// Restore the service lists. Unlike Create and Up, we don't need to keep
-	// Mutagen defined as a disabled service here because Start doesn't care
-	// about orphan services.
-	project.Services = services
-	project.DisabledServices = disabledServices
-
 	// Invoke the underlying implementation.
-	return s.service.Start(ctx, project, options)
+	return s.service.Start(ctx, projectName, options)
 }
 
 // Restart implements github.com/docker/compose/v2/pkg/api.Service.Restart.
-func (s *composeService) Restart(ctx context.Context, project *types.Project, options api.RestartOptions) error {
-	return s.service.Restart(ctx, project, options)
+func (s *composeService) Restart(ctx context.Context, projectName string, options api.RestartOptions) error {
+	return s.service.Restart(ctx, projectName, options)
 }
 
 // Stop implements github.com/docker/compose/v2/pkg/api.Service.Stop.
-func (s *composeService) Stop(ctx context.Context, project *types.Project, options api.StopOptions) error {
-	// Process Mutagen extensions for the project.
-	if err := s.liaison.processProject(project); err != nil {
-		return fmt.Errorf("unable to process project: %w", err)
-	}
-
-	// Cache the nominal service list.
-	services := project.Services
-
-	// Inject the Mutagen service into the project, but only if no services have
-	// been specified explictly (meaning that all services should be stopped,
-	// including the Mutagen service).
-	if len(options.Services) == 0 {
-		project.Services = append(project.Services, s.liaison.mutagenService)
-	}
-
-	// Invoke the underlying implementation.
-	result := s.service.Stop(ctx, project, options)
-
-	// Restore the service list.
-	project.Services = services
-
-	// Done.
-	return result
+func (s *composeService) Stop(ctx context.Context, projectName string, options api.StopOptions) error {
+	return s.service.Stop(ctx, projectName, options)
 }
 
 // Up implements github.com/docker/compose/v2/pkg/api.Service.Up.
@@ -203,7 +175,10 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// if the Mutagen service is already stopped.
 	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
-	if err := s.service.Stop(ctx, project, api.StopOptions{}); err != nil {
+	mutagenStopOptions := api.StopOptions{
+		Services: []string{sidecarServiceName},
+	}
+	if err := s.service.Stop(ctx, project.Name, mutagenStopOptions); err != nil {
 		project.Services = services
 		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to stop Mutagen Compose sidecar service: %w", err)
@@ -216,7 +191,7 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// Restore the service lists but keep the Mutagen service defined so that it
 	// doesn't appear as an orphan service.
 	project.Services = services
-	project.DisabledServices = append(disabledServices, s.liaison.mutagenService)
+	project.DisabledServices = appendServiceByCopy(disabledServices, s.liaison.mutagenService)
 
 	// Invoke the underlying implementation.
 	result := s.service.Up(ctx, project, options)
@@ -240,7 +215,7 @@ func (s *composeService) Down(ctx context.Context, projectName string, options a
 	var services types.Services
 	if options.Project != nil {
 		services = options.Project.Services
-		options.Project.Services = append(options.Project.Services, s.liaison.mutagenService)
+		options.Project.Services = appendServiceByCopy(options.Project.Services, s.liaison.mutagenService)
 	}
 
 	// Invoke the underlying implementation.
@@ -296,8 +271,8 @@ func (s *composeService) Convert(ctx context.Context, project *types.Project, op
 }
 
 // Kill implements github.com/docker/compose/v2/pkg/api.Service.Kill.
-func (s *composeService) Kill(ctx context.Context, project *types.Project, options api.KillOptions) error {
-	return s.service.Kill(ctx, project, options)
+func (s *composeService) Kill(ctx context.Context, projectName string, options api.KillOptions) error {
+	return s.service.Kill(ctx, projectName, options)
 }
 
 // RunOneOffContainer implements
@@ -307,8 +282,8 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 }
 
 // Remove implements github.com/docker/compose/v2/pkg/api.Service.Remove.
-func (s *composeService) Remove(ctx context.Context, project *types.Project, options api.RemoveOptions) error {
-	return s.service.Remove(ctx, project, options)
+func (s *composeService) Remove(ctx context.Context, projectName string, options api.RemoveOptions) error {
+	return s.service.Remove(ctx, projectName, options)
 }
 
 // Exec implements github.com/docker/compose/v2/pkg/api.Service.Exec.
@@ -317,8 +292,8 @@ func (s *composeService) Exec(ctx context.Context, projectName string, options a
 }
 
 // Copy implements github.com/docker/compose/v2/pkg/api.Service.Copy.
-func (s *composeService) Copy(ctx context.Context, project string, options api.CopyOptions) error {
-	return s.service.Copy(ctx, project, options)
+func (s *composeService) Copy(ctx context.Context, projectName string, options api.CopyOptions) error {
+	return s.service.Copy(ctx, projectName, options)
 }
 
 // Pause implements github.com/docker/compose/v2/pkg/api.Service.Pause.
