@@ -104,10 +104,10 @@ const (
 // adjustUnknownCommandErrors adjusts the Compose root command to return unknown
 // command errors that correspond to Mutagen Compose.
 func adjustUnknownCommandErrors(cmd *cobra.Command) {
-	// Extract the original entrypoint.
+	// Extract the original entry point.
 	originalRunE := cmd.RunE
 
-	// Override the entrypoint with one that changes the error message for
+	// Override the entry point with one that changes the error message for
 	// unknown command errors.
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		err := originalRunE(cmd, args)
@@ -141,7 +141,7 @@ func adjustVersionCommand(cmd *cobra.Command) {
 	shortFlag := flags.Lookup("short")
 	shortFlag.Usage = "Show only the version numbers."
 
-	// Override the command entrypoint.
+	// Override the command entry point.
 	version.RunE = func(cmd *cobra.Command, args []string) error {
 		// Look up the format flag.
 		formatFlag := flags.Lookup("format")
