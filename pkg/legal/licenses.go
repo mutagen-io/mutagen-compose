@@ -4,7 +4,7 @@ package legal
 // dependencies.
 const Licenses = `Mutagen Compose
 
-Copyright (c) 2020 - present Mutagen IO, Inc.
+Copyright (c) 2020-present Mutagen IO, Inc.
 
 Licensed under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
@@ -18,7 +18,7 @@ Mutagen
 
 https://github.com/mutagen-io/mutagen
 
-Copyright (c) 2016 - present Mutagen IO, Inc.
+Copyright (c) 2016-present Mutagen IO, Inc.
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
@@ -266,6 +266,7 @@ flock
 https://github.com/gofrs/flock
 
 Copyright (c) 2015-2020, Tim Heckman
+All rights reserved.
 
 Used under the terms of the 3-Clause BSD License (gofrs version). A copy of this
 license can be found later in this text and a templated version can be found
@@ -290,7 +291,8 @@ GoDotEnv
 
 https://github.com/joho/godotenv
 
-Forked and modified at https://github.com/compose-spec/godotenv.
+Forked and modified at https://github.com/compose-spec/compose-go in the dotenv
+directory.
 
 Copyright (c) 2013 John Barton
 
@@ -535,16 +537,16 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
-GRPC-OpenTracing
+gRPC-Gateway
 
-https://github.com/grpc-ecosystem/grpc-opentracing
+https://github.com/grpc-ecosystem/grpc-gateway
 
-Copyright (c) 2016, gRPC Ecosystem
+Copyright (c) 2015, Gengo, Inc.
 All rights reserved.
 
-Used under the terms of the 3-Clause BSD License (grpc-opentracing version). A
-copy of this license can be found later in this text and a templated version can
-be found online at https://opensource.org/licenses/BSD-3-Clause.
+Used under the terms of the 3-Clause BSD License (Gengo, Inc. version). A copy
+of this license can be found later in this text and a templated version can be
+found online at https://opensource.org/licenses/BSD-3-Clause.
 
 Also used under the terms of the Google GRPC IP Rights Grant. A copy of this
 rights grant can be found later in this text.
@@ -553,7 +555,7 @@ rights grant can be found later in this text.
 
 Go-generated Protocol Buffers Packages
 
-https://github.com/google/go-genproto
+https://github.com/googleapis/go-genproto
 
 Copyright 2016 Google Inc.
 
@@ -586,6 +588,35 @@ Copyright (c) 2017 The Go Authors. All rights reserved.
 Used under the terms of the 3-Clause BSD License (Google version). A copy of
 this license can be found later in this text and a templated version can be
 found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+go-toml
+
+https://github.com/pelletier/go-toml
+
+Copyright (c) 2013 - 2021 Thomas Pelletier, Eric Anderton
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+localtime.go, localtime_test.go:
+
+Originals:
+    https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/civil/civil.go
+    https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/civil/civil_test.go
+Changes:
+    * Renamed files from civil* to localtime*.
+    * Package changed from civil to toml.
+    * 'Local' prefix added to all structs.
+License:
+    https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/LICENSE
+
+Copyright 2016 Google LLC
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
@@ -766,11 +797,34 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
+Minimal Go logging using logr and Go's standard library
+
+https://github.com/go-logr/stdr
+
+Copyright 2019 - 2021 The logr Authors.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
 Logrus
 
 https://github.com/sirupsen/logrus
 
 Copyright (c) 2014 Simon Eskildsen
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+httpsnoop
+
+https://github.com/felixge/httpsnoop
+
+Copyright (c) 2016 Felix Geisendörfer (felix@debuggable.com)
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
@@ -993,6 +1047,18 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
+ttrpc
+
+https://github.com/containerd/ttrpc
+
+Copyright The containerd Authors
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
 typeurl
 
 https://github.com/containerd/typeurl
@@ -1069,6 +1135,18 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
+json
+
+https://github.com/kubernetes-sigs/json
+
+Copyright 2021 The Kubernetes Authors.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
 structured-merge-diff
 
 https://github.com/kubernetes-sigs/structured-merge-diff
@@ -1123,11 +1201,36 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
-OpenTracing API for Go
+OpenTelemetry-Go Contrib
 
-https://github.com/opentracing/opentracing-go
+https://github.com/open-telemetry/opentelemetry-go-contrib
 
-Copyright 2016 The OpenTracing Authors
+Copyright The OpenTelemetry Authors
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+OpenTelemetry-Go
+
+https://github.com/open-telemetry/opentelemetry-go
+
+Copyright The OpenTelemetry Authors
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+opentelemetry-proto-go
+
+https://github.com/open-telemetry/opentelemetry-proto-go
+
+Copyright The OpenTelemetry Authors
+Copyright 2019, OpenTelemetry Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1250,6 +1353,17 @@ fsutil
 https://github.com/tonistiigi/fsutil
 
 Copyright 2017 Tõnis Tiigi <tonistiigi@gmail.com>
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+go-rosetta
+
+https://github.com/tonistiigi/go-rosetta
+
+Copyright (c) 2020 Tõnis Tiigi
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
@@ -1473,32 +1587,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
-3-Clause BSD License (grpc-opentracing version)
+3-Clause BSD License (Gengo, Inc. version)
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
 
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
+    * Redistributions in binary form must reproduce the above copyright notice,
+      this list of conditions and the following disclaimer in the documentation
+      and/or other materials provided with the distribution.
 
-* Neither the name of grpc-opentracing nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+    * Neither the name of Gengo, Inc. nor the names of its
+      contributors may be used to endorse or promote products derived from this
+      software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
