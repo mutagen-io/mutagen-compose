@@ -105,10 +105,10 @@ func adjustUsageInformation(cmd *cobra.Command) {
 const (
 	// unknownCommandErrorPrefix is the error prefix used by unknown command
 	// errors in Compose.
-	unknownCommandErrorPrefix = `unknown docker command: "compose`
+	unknownCommandErrorPrefix = `unknown docker command: "compose `
 	// replacementUnknownCommandErrorPrefix is the altered error prefix used by
 	// unknown command errors in Compose.
-	replacementUnknownCommandErrorPrefix = `unknown command: "` + commandName
+	replacementUnknownCommandErrorPrefix = `unknown command: "`
 )
 
 // adjustUnknownCommandErrors adjusts the Compose root command to return unknown
