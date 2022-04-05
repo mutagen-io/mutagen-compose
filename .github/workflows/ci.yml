@@ -6,47 +6,35 @@ on: [push, pull_request]
 
 # Define the workflow jobs.
 jobs:
-  versioning:
-    name: Versioning
+  verification:
+    name: Commit Verification
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
         with:
-          go-version: '^1.18'
-      - run: go version
-      - name: "Analyze version information and release status"
-        id: analyze
+          fetch-depth: 0
+      - name: "Perform commit verification"
         run: |
-          # Determine whether or not this is a release build.
-          RELEASE="${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}"
+          # Determine the target commit range.
+          export VERIFY_COMMIT_START="${{ github.event.pull_request.base.sha }}"
+          export VERIFY_COMMIT_END="${{ github.event.pull_request.head.sha }}"
 
-          # Determine version target information for Go. If this is a release,
-          # then we'll use the tag, otherwise we'll use the raw commit digest.
-          if [ "${RELEASE}" = "true" ]; then
-            TARGET="${GITHUB_REF#refs/tags/}"
-          else
-            TARGET="${GITHUB_SHA}"
-          fi
-
-          # Set outputs.
-          echo ::set-output name=release::${RELEASE}
-          echo ::set-output name=target::${TARGET}
-    outputs:
-      release: ${{ steps.analyze.outputs.release }}
-      target: ${{ steps.analyze.outputs.target }}
+          # Perform verification.
+          scripts/ci/verify_commits.sh
   macos:
     name: macOS
     runs-on: macos-11
-    needs: [versioning]
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.18'
-      - run: go version
       - name: "Install sha256sum"
         run: brew install coreutils
+      - run: scripts/ci/setup_go.sh
       - run: scripts/ci/analyze.sh
       - run: scripts/ci/test.sh
       - run: scripts/ci/build.sh
@@ -55,17 +43,20 @@ jobs:
           MACOS_CODESIGN_CERTIFICATE_AND_KEY: ${{ secrets.MACOS_CODESIGN_CERTIFICATE_AND_KEY }}
           MACOS_CODESIGN_CERTIFICATE_AND_KEY_PASSWORD: ${{ secrets.MACOS_CODESIGN_CERTIFICATE_AND_KEY_PASSWORD }}
       - run: scripts/ci/notarize.sh
-        if: ${{ needs.versioning.outputs.release == 'true' }}
+        if: github.ref_type == 'tag'
         env:
           MACOS_NOTARIZE_APPLE_ID: ${{ secrets.MACOS_NOTARIZE_APPLE_ID }}
           MACOS_NOTARIZE_APP_SPECIFIC_PASSWORD: ${{ secrets.MACOS_NOTARIZE_APP_SPECIFIC_PASSWORD }}
           MACOS_NOTARIZE_TEAM_ID: ${{ secrets.MACOS_NOTARIZE_TEAM_ID }}
+      - run: scripts/ci/sha256sum.sh
       - uses: crazy-max/ghaction-import-gpg@v3
         id: import_gpg
+        if: github.ref_type == 'tag'
         with:
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
           passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
-      - run: scripts/ci/sha256sum.sh
+      - run: scripts/ci/sha256sign.sh
+        if: github.ref_type == 'tag'
         env:
           SHA256_GPG_SIGNING_IDENTITY: ${{ steps.import_gpg.outputs.email }}
       - uses: actions/upload-artifact@v2
@@ -76,26 +67,27 @@ jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.18'
-      - run: docker version
-      - run: go version
+      - run: scripts/ci/setup_go.sh
       - run: scripts/ci/analyze.sh
       - run: scripts/ci/test.sh
       - run: scripts/ci/build.sh
   windows:
     name: Windows
     runs-on: windows-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: '^1.18'
-      - run: docker version
-      - run: go version
+      - run: scripts/ci/setup_go.sh
+        shell: bash
       - run: scripts/ci/analyze.sh
         shell: bash
       - run: scripts/ci/test.sh
@@ -105,8 +97,9 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [versioning, macos, linux, windows]
-    if: ${{ needs.versioning.outputs.release == 'true' }}
+    if: github.ref_type == 'tag'
+    needs: [macos, linux, windows]
+    timeout-minutes: 10
     steps:
       - uses: actions/download-artifact@v2
         with:
