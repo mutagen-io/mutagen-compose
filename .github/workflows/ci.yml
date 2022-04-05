@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.17'
+          go-version: '^1.18'
       - run: go version
       - name: "Analyze version information and release status"
         id: analyze
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.17'
+          go-version: '^1.18'
       - run: go version
       - name: "Install sha256sum"
         run: brew install coreutils
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.17'
+          go-version: '^1.18'
       - run: docker version
       - run: go version
       - run: scripts/ci/analyze.sh
@@ -93,7 +93,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.17'
+          go-version: '^1.18'
       - run: docker version
       - run: go version
       - run: scripts/ci/analyze.sh

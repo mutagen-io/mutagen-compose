@@ -17,7 +17,7 @@ import (
 // booleans, i.e. "true" or "false", will still be handled by the
 // IgnoreVCSMode.UnmarshalText method).
 func boolToIgnoreVCSModeHookFunc() mapstructure.DecodeHookFuncType {
-	return func(valueType reflect.Type, storageType reflect.Type, data interface{}) (interface{}, error) {
+	return func(valueType reflect.Type, storageType reflect.Type, data any) (any, error) {
 		// If the incoming type isn't a boolean, then we're done.
 		if valueType.Kind() != reflect.Bool {
 			return data, nil

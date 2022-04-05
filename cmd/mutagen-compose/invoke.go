@@ -35,26 +35,21 @@ import (
 	"github.com/mutagen-io/mutagen-compose/pkg/mutagen"
 )
 
-func init() {
-	// Set the warning that's presented in the event of failure.
-	commands.Warning = "Mutagen Compose is currently experimental. " +
-		"Feedback can be provided at https://github.com/mutagen-io/mutagen-compose"
-}
-
 // invokeCompose invokes Compose via the plugin infrastructure. It requires that
 // os.Args be set in a manner that emulates execution as a plugin.
 func invokeCompose(liaison *mutagen.Liaison) {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
+		liaison.RegisterDockerCLI(dockerCli)
+		liaisedCli := liaison.DockerCLI()
 		lazyInit := api.NewServiceProxy()
-		cmd := commands.RootCommand(lazyInit)
+		cmd := commands.RootCommand(liaisedCli, lazyInit)
 		originalPreRun := cmd.PersistentPreRunE
 		cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
 			liaison.RegisterDockerFlags(cmd.Root().Flags())
-			liaison.RegisterDockerCLI(dockerCli)
-			liaison.RegisterComposeService(compose.NewComposeService(liaison.DockerClient(), dockerCli.ConfigFile()))
+			liaison.RegisterComposeService(compose.NewComposeService(liaisedCli))
 			lazyInit.WithService(liaison.ComposeService())
 			if originalPreRun != nil {
 				return originalPreRun(cmd, args)
