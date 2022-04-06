@@ -7,6 +7,8 @@ import (
 
 // sidecarConfiguration encodes sidecar service configuration.
 type sidecarConfiguration struct {
+	// Features controls the sidecar feature set.
+	Features string `mapstructure:"features"`
 	// Restart is the restart policy for the sidecar container.
 	Restart string `yaml:"restart"`
 }
