@@ -82,7 +82,11 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 	// hidden start progress updates aren't an issue for Create).
 	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
-	if err := s.service.Create(ctx, project, api.CreateOptions{IgnoreOrphans: true}); err != nil {
+	mutagenCreateOptions := api.CreateOptions{
+		Services:      []string{sidecarServiceName},
+		IgnoreOrphans: true,
+	}
+	if err := s.service.Create(ctx, project, mutagenCreateOptions); err != nil {
 		project.Services = services
 		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to create Mutagen Compose sidecar service: %w", err)
@@ -178,11 +182,20 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	mutagenStopOptions := api.StopOptions{
 		Services: []string{sidecarServiceName},
 	}
+	mutagenUpOptions := api.UpOptions{
+		Create: api.CreateOptions{
+			Services:      []string{sidecarServiceName},
+			IgnoreOrphans: true,
+		},
+		Start: api.StartOptions{
+			AttachTo: []string{sidecarServiceName},
+		},
+	}
 	if err := s.service.Stop(ctx, project.Name, mutagenStopOptions); err != nil {
 		project.Services = services
 		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to stop Mutagen Compose sidecar service: %w", err)
-	} else if err = s.service.Up(ctx, project, api.UpOptions{Create: api.CreateOptions{IgnoreOrphans: true}}); err != nil {
+	} else if err = s.service.Up(ctx, project, mutagenUpOptions); err != nil {
 		project.Services = services
 		project.DisabledServices = disabledServices
 		return fmt.Errorf("unable to bring up Mutagen Compose sidecar service: %w", err)
