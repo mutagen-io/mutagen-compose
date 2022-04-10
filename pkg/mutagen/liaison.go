@@ -162,6 +162,9 @@ func (l *Liaison) processProject(project *types.Project) error {
 			),
 			ErrorUnused: true,
 			Result:      xMutagen,
+			MatchName: func(mapKey, fieldName string) bool {
+				return mapKey == fieldName
+			},
 		})
 		if err != nil {
 			return fmt.Errorf("unable to create configuration decoder: %w", err)
