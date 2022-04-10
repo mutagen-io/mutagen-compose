@@ -433,14 +433,14 @@ func (l *Liaison) processProject(project *types.Project) error {
 	}
 
 	// Determine the target sidecar image. At the moment, the only supported
-	// feature specification is "basic", though we may include more granular
+	// feature specification is "standard", though we may include more granular
 	// feature sets in the future. We default to the enhanced feature set.
 	image := sidecarImage
 	var capabilities []string
 	if xMutagen.Sidecar.Features == "" {
 		image += enhancedTagSuffix
 		capabilities = enhancedCapabilities
-	} else if xMutagen.Sidecar.Features != "basic" {
+	} else if xMutagen.Sidecar.Features != "standard" {
 		return fmt.Errorf("invalid sidecar feature level specification: %s", xMutagen.Sidecar.Features)
 	}
 
