@@ -492,6 +492,9 @@ func (l *Liaison) processProject(project *types.Project) error {
 		}
 		l.mutagenService.Restart = xMutagen.Sidecar.Restart
 	}
+	if xMutagen.Sidecar.ContainerName != "" {
+		l.mutagenService.ContainerName = xMutagen.Sidecar.ContainerName
+	}
 
 	// Store session specifications.
 	l.forwarding = forwardingSpecifications
