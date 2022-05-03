@@ -11,6 +11,8 @@ type sidecarConfiguration struct {
 	Features string `mapstructure:"features"`
 	// Restart is the restart policy for the sidecar container.
 	Restart string `mapstructure:"restart"`
+	// ContainerName is the name given to the sidecar container.
+	ContainerName string `mapstructure:"container_name"`
 }
 
 // forwardingConfiguration encodes a forwarding session specification.
