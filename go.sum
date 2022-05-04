@@ -304,8 +304,8 @@ github.com/cockroachdb/errors v1.2.4/go.mod h1:rQD95gz6FARkaKkQXUksEje/d9a6wBJoC
 github.com/cockroachdb/logtags v0.0.0-20190617123548-eb05cc24525f/go.mod h1:i/u985jwjWRlyHXQbwatDASoW0RMlZ/3i9yJHE2xLkI=
 github.com/codahale/hdrhistogram v0.0.0-20160425231609-f8ad88b59a58/go.mod h1:sE/e/2PUdi/liOCUjSTXgM1o87ZssimdTWN964YiIeI=
 github.com/compose-spec/compose-go v1.0.8/go.mod h1:REnCbBugoIdHB7S1sfkN/aJ7AJpNApGNjNiVjA9L8x4=
-github.com/compose-spec/compose-go v1.2.2 h1:y1dwl3KUTBnWPVur6EZno9zUIum6Q87/F5keljnGQB4=
-github.com/compose-spec/compose-go v1.2.2/go.mod h1:pAy7Mikpeft4pxkFU565/DRHEbDfR84G6AQuiL+Hdg8=
+github.com/compose-spec/compose-go v1.2.4 h1:nzTFqM8+2J7Veao5Pq5U451thinv3U1wChIvcjX59/A=
+github.com/compose-spec/compose-go v1.2.4/go.mod h1:pAy7Mikpeft4pxkFU565/DRHEbDfR84G6AQuiL+Hdg8=
 github.com/compose-spec/godotenv v1.1.1/go.mod h1:zF/3BOa18Z24tts5qnO/E9YURQanJTBUf7nlcCTNsyc=
 github.com/containerd/aufs v0.0.0-20200908144142-dab0cbea06f4/go.mod h1:nukgQABAEopAHvB6j7cnP5zJ+/3aVcE7hCYqvIwAHyE=
 github.com/containerd/aufs v0.0.0-20201003224125-76a6863f2989/go.mod h1:AkGGQs9NM2vtYHaUen+NljV0/baGCAPELGm2q9ZXpWU=
@@ -477,8 +477,8 @@ github.com/docker/buildx v0.8.1/go.mod h1:9v3laulRPwglXHuPulXa5onXQPlgrIq6LnCXc7
 github.com/docker/cli v20.10.3-0.20220309205733-2b52f62e9627+incompatible h1:RWXvuBczWuSIMjI69AnkNklNNVX2gmS0X+15AttGDVk=
 github.com/docker/cli v20.10.3-0.20220309205733-2b52f62e9627+incompatible/go.mod h1:JLrzqnKDaYBop7H2jaqPtU4hHvMKP+vjCwu2uszcLI8=
 github.com/docker/cli-docs-tool v0.4.0/go.mod h1:rgW5KKdNpLMBIuH4WQ/1RNh38nH+/Ay5jgL4P0ZMPpY=
-github.com/docker/compose/v2 v2.4.1 h1:lT1Yp++4xa0kK1E+yf8U+UiXk4aZPuRUA/YJxlbTp2Q=
-github.com/docker/compose/v2 v2.4.1/go.mod h1:nk6Y6aGgUeJLxcn7xU7wcmjJolDj10hb3OauUOIZr7A=
+github.com/docker/compose/v2 v2.5.0 h1:KDz9q73JaBiH+D9VplReSKYwhU3HI2Tppd2b4eh9BjU=
+github.com/docker/compose/v2 v2.5.0/go.mod h1:YrjYisQK5b2YaioFCipByEWCbAvvarekZ2wijYesL7Q=
 github.com/docker/distribution v0.0.0-20190905152932-14b96e55d84c/go.mod h1:0+TTO4EOBfRPhZXAeF1Vu+W3hHZ8eLp8PgKVZlcvtFY=
 github.com/docker/distribution v2.6.0-rc.1.0.20180327202408-83389a148052+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/distribution v2.7.0+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
