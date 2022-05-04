@@ -188,6 +188,7 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 			IgnoreOrphans: true,
 		},
 		Start: api.StartOptions{
+			Project:  project,
 			AttachTo: []string{sidecarServiceName},
 		},
 	}
