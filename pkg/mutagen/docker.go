@@ -42,13 +42,20 @@ func (c *dockerAPIClient) ContainerStart(ctx context.Context, container string, 
 		return err
 	}
 
-	// If this is a Mutagen compose sidecar container, then reconcile Mutagen
-	// sessions.
+	// If this is a Mutagen compose sidecar container, then either reconcile
+	// Mutagen sessions or just resume them, depending on whether or not we have
+	// session definitions from the project.
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
 		return fmt.Errorf("unable to determine if container is sidecar: %w", err)
 	} else if sidecar {
-		if err := c.liaison.reconcileSessions(ctx, container); err != nil {
-			return fmt.Errorf("unable to reconcile Mutagen sessions: %w", err)
+		if c.liaison.processedProject {
+			if err := c.liaison.reconcileSessions(ctx, container); err != nil {
+				return fmt.Errorf("unable to reconcile Mutagen sessions: %w", err)
+			}
+		} else {
+			if err := c.liaison.resumeSessions(ctx, container); err != nil {
+				return fmt.Errorf("unable to resume Mutagen sessions: %w", err)
+			}
 		}
 	}
 
