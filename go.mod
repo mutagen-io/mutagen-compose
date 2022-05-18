@@ -3,11 +3,11 @@ module github.com/mutagen-io/mutagen-compose
 go 1.18
 
 require (
-	github.com/compose-spec/compose-go v1.2.4
+	github.com/compose-spec/compose-go v1.2.5
 	github.com/docker/cli v20.10.12+incompatible
-	github.com/docker/compose/v2 v2.5.0
+	github.com/docker/compose/v2 v2.5.1
 	github.com/docker/docker v20.10.7+incompatible
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mutagen-io/mutagen v0.14.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
