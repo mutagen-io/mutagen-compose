@@ -177,6 +177,11 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// if the service is already running. Fortunately this operation has no
 	// effect or output if the Mutagen service doesn't yet exist, and no effect
 	// if the Mutagen service is already stopped.
+	//
+	// Note that we specify AttachTo in StartOptions because Start (which is
+	// invoked by Up) may use it as a fallback to construct the project on a
+	// name/label basis, not because we actually want to attach to the sidecar
+	// container (which we won't since we don't set Attach in StartOptions).
 	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	mutagenStopOptions := api.StopOptions{
