@@ -183,15 +183,15 @@ func (l *Liaison) processProject(project *types.Project) error {
 		} else if defaults.Destination != "" {
 			return errors.New("destination URL not allowed in default forwarding configuration")
 		}
-		defaultConfigurationForwarding = defaults.Configuration.Configuration()
+		defaultConfigurationForwarding = defaults.Configuration.ToInternal()
 		if err := defaultConfigurationForwarding.EnsureValid(false); err != nil {
 			return fmt.Errorf("invalid default forwarding configuration: %w", err)
 		}
-		defaultConfigurationSource = defaults.ConfigurationSource.Configuration()
+		defaultConfigurationSource = defaults.ConfigurationSource.ToInternal()
 		if err := defaultConfigurationSource.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default forwarding source configuration: %w", err)
 		}
-		defaultConfigurationDestination = defaults.ConfigurationDestination.Configuration()
+		defaultConfigurationDestination = defaults.ConfigurationDestination.ToInternal()
 		if err := defaultConfigurationDestination.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default forwarding destination configuration: %w", err)
 		}
@@ -208,15 +208,15 @@ func (l *Liaison) processProject(project *types.Project) error {
 		} else if defaults.Beta != "" {
 			return errors.New("beta URL not allowed in default synchronization configuration")
 		}
-		defaultConfigurationSynchronization = defaults.Configuration.Configuration()
+		defaultConfigurationSynchronization = defaults.Configuration.ToInternal()
 		if err := defaultConfigurationSynchronization.EnsureValid(false); err != nil {
 			return fmt.Errorf("invalid default synchronization configuration: %w", err)
 		}
-		defaultConfigurationAlpha = defaults.ConfigurationAlpha.Configuration()
+		defaultConfigurationAlpha = defaults.ConfigurationAlpha.ToInternal()
 		if err := defaultConfigurationAlpha.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default synchronization alpha configuration: %w", err)
 		}
-		defaultConfigurationBeta = defaults.ConfigurationBeta.Configuration()
+		defaultConfigurationBeta = defaults.ConfigurationBeta.ToInternal()
 		if err := defaultConfigurationBeta.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid default synchronization beta configuration: %w", err)
 		}
@@ -273,21 +273,21 @@ func (l *Liaison) processProject(project *types.Project) error {
 		networkDependencies[network] = nil
 
 		// Compute the session configuration.
-		configuration := session.Configuration.Configuration()
+		configuration := session.Configuration.ToInternal()
 		if err := configuration.EnsureValid(false); err != nil {
 			return fmt.Errorf("invalid forwarding session configuration for %s: %w", name, err)
 		}
 		configuration = forwarding.MergeConfigurations(defaultConfigurationForwarding, configuration)
 
 		// Compute the source-specific configuration.
-		sourceConfiguration := session.ConfigurationSource.Configuration()
+		sourceConfiguration := session.ConfigurationSource.ToInternal()
 		if err := sourceConfiguration.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid forwarding session source configuration for %s: %w", name, err)
 		}
 		sourceConfiguration = forwarding.MergeConfigurations(defaultConfigurationSource, sourceConfiguration)
 
 		// Compute the destination-specific configuration.
-		destinationConfiguration := session.ConfigurationDestination.Configuration()
+		destinationConfiguration := session.ConfigurationDestination.ToInternal()
 		if err := destinationConfiguration.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid forwarding session destination configuration for %s: %w", name, err)
 		}
@@ -379,21 +379,21 @@ func (l *Liaison) processProject(project *types.Project) error {
 		}
 
 		// Compute the session configuration.
-		configuration := session.Configuration.Configuration()
+		configuration := session.Configuration.ToInternal()
 		if err := configuration.EnsureValid(false); err != nil {
 			return fmt.Errorf("invalid synchronization session configuration for %s: %v", name, err)
 		}
 		configuration = synchronization.MergeConfigurations(defaultConfigurationSynchronization, configuration)
 
 		// Compute the alpha-specific configuration.
-		alphaConfiguration := session.ConfigurationAlpha.Configuration()
+		alphaConfiguration := session.ConfigurationAlpha.ToInternal()
 		if err := alphaConfiguration.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid synchronization session alpha configuration for %s: %v", name, err)
 		}
 		alphaConfiguration = synchronization.MergeConfigurations(defaultConfigurationAlpha, alphaConfiguration)
 
 		// Compute the beta-specific configuration.
-		betaConfiguration := session.ConfigurationBeta.Configuration()
+		betaConfiguration := session.ConfigurationBeta.ToInternal()
 		if err := betaConfiguration.EnsureValid(true); err != nil {
 			return fmt.Errorf("invalid synchronization session beta configuration for %s: %v", name, err)
 		}

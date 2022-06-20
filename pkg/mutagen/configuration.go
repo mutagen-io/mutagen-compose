@@ -1,8 +1,8 @@
 package mutagen
 
 import (
-	"github.com/mutagen-io/mutagen/pkg/configuration/forwarding"
-	"github.com/mutagen-io/mutagen/pkg/configuration/synchronization"
+	"github.com/mutagen-io/mutagen/pkg/api/models/forwarding"
+	"github.com/mutagen-io/mutagen/pkg/api/models/synchronization"
 )
 
 // sidecarConfiguration encodes sidecar service configuration.
