@@ -31,6 +31,8 @@ type composeService struct {
 	liaison *Liaison
 	// service is the underlying Compose service.
 	service api.Service
+	// startInvoked tracks whether or not the Start method has been invoked.
+	startInvoked bool
 }
 
 // Build implements github.com/docker/compose/v2/pkg/api.Service.Build.
@@ -109,6 +111,9 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 
 // Start implements github.com/docker/compose/v2/pkg/api.Service.Start.
 func (s *composeService) Start(ctx context.Context, projectName string, options api.StartOptions) error {
+	// Track start invocation.
+	s.startInvoked = true
+
 	// Start the Mutagen Compose sidecar service first. We do this for
 	// consistency with Up and for the flag-related reasons outlined there (the
 	// hidden start progress updates aren't an issue for Start).
@@ -297,6 +302,31 @@ func (s *composeService) Kill(ctx context.Context, projectName string, options a
 // RunOneOffContainer implements
 // github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
 func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.Project, options api.RunOptions) (int, error) {
+	// The run command won't invoke Start unless the target service has a
+	// non-zero number of dependenies to start (though it will invariably invoke
+	// Create, even in the absence of dependencies, so that other components
+	// (such as volumes and networks) are initialized). As such, we need to
+	// start the Mutagen sidecar service if Start wasn't invoked directly.
+	// TODO: We may want to replace this with more holistic tracking of the
+	// Mutagen sidecar service's operational state, but until the internal
+	// Compose backend API stabilizes, it seems like a "quick fix" is best. In
+	// any case, it's a robust fix, but it could be slightly inefficient if the
+	// backend is re-used (which it currently isn't for RunOneOffContainer). It
+	// might make sense to include the Mutagen sidecar service as a dependency
+	// of all other services (or at least those referencing sync-targeted
+	// volumes or referenced by forwarding operations) and let Compose handle
+	// things more directly, but even that would require disallowing --no-deps
+	// in run and probably some other hacky fixes.
+	if !s.startInvoked {
+		mutagenStartOptions := api.StartOptions{
+			AttachTo: []string{sidecarServiceName},
+		}
+		if err := s.service.Start(ctx, project.Name, mutagenStartOptions); err != nil {
+			return 1, fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)
+		}
+	}
+
+	// Invoke the underlying implementation.
 	return s.service.RunOneOffContainer(ctx, project, options)
 }
 

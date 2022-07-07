@@ -102,7 +102,7 @@ func (l *Liaison) RegisterComposeService(service api.Service) {
 // This function must only be called after a Compose service has been registered
 // with RegisterComposeService.
 func (l *Liaison) ComposeService() api.Service {
-	return &composeService{l, l.composeService}
+	return &composeService{liaison: l, service: l.composeService}
 }
 
 // processProject loads Mutagen configuration from the specified project, adds
