@@ -19,6 +19,9 @@ import (
 func boolToIgnoreVCSModeHookFunc() mapstructure.DecodeHookFuncType {
 	return func(valueType reflect.Type, storageType reflect.Type, data any) (any, error) {
 		// If the incoming type isn't a boolean, then we're done.
+		// TODO: Should we be returning an error here? Textual representations
+		// will already have been handled by UnmarshalText, so there's no reason
+		// that we should be seeing anything other than a boolean here.
 		if valueType.Kind() != reflect.Bool {
 			return data, nil
 		}
