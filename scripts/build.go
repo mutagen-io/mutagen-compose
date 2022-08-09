@@ -90,28 +90,26 @@ func (t Target) ExecutableName(base string) string {
 	return base
 }
 
-// goEnv generates an environment that can be used when invoking the Go
-// toolchain to generate output for the target.
-func (t Target) goEnv() ([]string, error) {
-	// Duplicate the existing environment.
-	result := os.Environ()
-
+// appendGoEnv modifies an environment specification to make the Go toolchain
+// generate output for the target. It assumes that the resulting environment
+// will be used with os/exec.Cmd and thus doesn't avoid duplicate variables.
+func (t Target) appendGoEnv(environment []string) []string {
 	// Override GOOS/GOARCH.
-	result = append(result, fmt.Sprintf("GOOS=%s", t.GOOS))
-	result = append(result, fmt.Sprintf("GOARCH=%s", t.GOARCH))
+	environment = append(environment, fmt.Sprintf("GOOS=%s", t.GOOS))
+	environment = append(environment, fmt.Sprintf("GOARCH=%s", t.GOARCH))
 
 	// Disable cgo.
-	result = append(result, "CGO_ENABLED=0")
+	environment = append(environment, "CGO_ENABLED=0")
 
 	// Set up ARM target support. See notes for definition of minimumARMSupport.
 	// We don't need to unset any existing GOARM variables since they simply
 	// won't be used if we're not targeting (non-64-bit) ARM systems.
 	if t.GOARCH == "arm" {
-		result = append(result, fmt.Sprintf("GOARM=%s", minimumARMSupport))
+		environment = append(environment, fmt.Sprintf("GOARM=%s", minimumARMSupport))
 	}
 
 	// Done.
-	return result, nil
+	return environment
 }
 
 // IsCrossTarget determines whether or not the target represents a
@@ -144,11 +142,7 @@ func (t Target) Build(url, output string, ldflags string) error {
 	builder := exec.Command("go", arguments...)
 
 	// Set the environment.
-	environment, err := t.goEnv()
-	if err != nil {
-		return fmt.Errorf("unable to create build environment: %w", err)
-	}
-	builder.Env = environment
+	builder.Env = t.appendGoEnv(builder.Environ())
 
 	// Forward input, output, and error streams.
 	builder.Stdin = os.Stdin
