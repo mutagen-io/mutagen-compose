@@ -163,5 +163,8 @@ replace (
 	k8s.io/client-go => k8s.io/client-go v0.22.4
 )
 
-// Custom replacements made by Mutagen.
-replace k8s.io/apimachinery v0.21.3 => github.com/mutagen-io/apimachinery v0.21.3-mutagen1
+// NOTE: We don't make the same custom k8s.io/apimachinery replacement made by
+// Mutagen because that replacement only serves to avoid a dependency on klog,
+// which we already incur with Mutagen Compose. Moreover, none of the
+// k8s.io/apimachinery code is actually invoked by Mutagen Compose - all of that
+// happens inside of the Mutagen daemon itself.
