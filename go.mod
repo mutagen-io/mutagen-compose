@@ -122,14 +122,14 @@ require (
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.12.0 // indirect
-	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
-	golang.org/x/net v0.0.0-20220906165146-f3363e06e74c // indirect
+	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b // indirect
+	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
+	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
+	golang.org/x/term v0.0.0-20220919170432-7a66f970e087 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
+	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220808145710-bf34ca4dd83a // indirect
 	google.golang.org/grpc v1.48.0 // indirect
