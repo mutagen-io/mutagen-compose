@@ -44,6 +44,9 @@ func fauxTopLevelCommandForHelpAndUsage() *cobra.Command {
 	root.Use = commandName
 	root.Short = commandDescription
 
+	// Hide Cobra's completion command.
+	root.CompletionOptions.HiddenDefaultCmd = true
+
 	// Adjust the version command like we do for the real command hierarchy.
 	adjustVersionCommand(root)
 

@@ -117,8 +117,17 @@ func (s *composeService) Start(ctx context.Context, projectName string, options 
 	// Start the Mutagen Compose sidecar service first. We do this for
 	// consistency with Up and for the flag-related reasons outlined there (the
 	// hidden start progress updates aren't an issue for Start).
+	//
+	// In order to start only our target service, we avoid passing any project
+	// instance that might have been provided in options. This forces the Start
+	// method to construct a project dynamically. Oddly enough, the AttachTo
+	// field's list of services is the one used to generate the list of services
+	// during project creation in Start (though the Services field can be used
+	// for additional filtering). However, since Attach isn't specified in
+	// StartOptions, no attaching will actually take place.
 	mutagenStartOptions := api.StartOptions{
 		AttachTo: []string{sidecarServiceName},
+		Wait:     true,
 	}
 	if err := s.service.Start(ctx, projectName, mutagenStartOptions); err != nil {
 		return fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)
@@ -170,23 +179,20 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 	// networks, for example, are always created when any service starts,
 	// regardless of whether or not it depends on them).
 	//
-	// To do this, we'll need to temporarily modify the service lists to include
-	// only the Mutagen service, because although the underlying create call
-	// will filter services if a list is specified in the create options, the
-	// underlying start call has no such option field. In this case, we'll tell
-	// the up operation to ignore orphans, since all other services at that
-	// point would be orphans.
-	//
 	// We also have to perform a stop operation on the Mutagen service before
 	// performing the up operation to ensure that session reconciliation occurs
 	// if the service is already running. Fortunately this operation has no
 	// effect or output if the Mutagen service doesn't yet exist, and no effect
 	// if the Mutagen service is already stopped.
 	//
-	// Note that we specify AttachTo in StartOptions because Start (which is
-	// invoked by Up) may use it as a fallback to construct the project on a
-	// name/label basis, not because we actually want to attach to the sidecar
-	// container (which we won't since we don't set Attach in StartOptions).
+	// To accomplish all of this, we have to temporarily modify the project's
+	// service definitions to suit the underlying create operation (which needs
+	// the Mutagen service defined). For the underlying stop and start
+	// operations, the project itself isn't used and is instead constructed
+	// dynamically, though note that the AttachTo field in StartOptions is the
+	// list that will be used to define the dynamically created project's
+	// services in start (though no attaching will actually take place since
+	// Attach isn't set in StartOptions).
 	project.Services = types.Services{s.liaison.mutagenService}
 	project.DisabledServices = nil
 	mutagenStopOptions := api.StopOptions{
@@ -198,8 +204,8 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 			IgnoreOrphans: true,
 		},
 		Start: api.StartOptions{
-			Project:  project,
 			AttachTo: []string{sidecarServiceName},
+			Wait:     true,
 		},
 	}
 	if err := s.service.Stop(ctx, project.Name, mutagenStopOptions); err != nil {
@@ -306,7 +312,9 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 	// non-zero number of dependenies to start (though it will invariably invoke
 	// Create, even in the absence of dependencies, so that other components
 	// (such as volumes and networks) are initialized). As such, we need to
-	// start the Mutagen sidecar service if Start wasn't invoked directly.
+	// start the Mutagen sidecar service if Start wasn't invoked directly. For
+	// information about the construction of StartOptions here, see Start.
+	//
 	// TODO: We may want to replace this with more holistic tracking of the
 	// Mutagen sidecar service's operational state, but until the internal
 	// Compose backend API stabilizes, it seems like a "quick fix" is best. In
@@ -320,6 +328,7 @@ func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.
 	if !s.startInvoked {
 		mutagenStartOptions := api.StartOptions{
 			AttachTo: []string{sidecarServiceName},
+			Wait:     true,
 		}
 		if err := s.service.Start(ctx, project.Name, mutagenStartOptions); err != nil {
 			return 1, fmt.Errorf("unable to start Mutagen Compose sidecar service: %w", err)

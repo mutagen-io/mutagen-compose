@@ -42,12 +42,12 @@ import (
 // single-use type, is not safe for concurrent usage, and its Shutdown method
 // should be invoked when usage is complete.
 type Liaison struct {
-	// dockerFlags are the associated Docker command line flags.
-	dockerFlags *pflag.FlagSet
 	// dockerCLI is the associated Docker CLI instance.
 	dockerCLI command.Cli
 	// composeService is the underlying Compose service.
 	composeService api.Service
+	// dockerFlags are the associated Docker command line flags.
+	dockerFlags *pflag.FlagSet
 	// processedProject indicates whether or not a project has already been
 	// processed.
 	processedProject bool
@@ -65,11 +65,6 @@ type Liaison struct {
 // RegisterDockerCLI registers the associated Docker CLI instance.
 func (l *Liaison) RegisterDockerCLI(cli command.Cli) {
 	l.dockerCLI = cli
-}
-
-// RegisterDockerFlags registers the associated Docker command line flags.
-func (l *Liaison) RegisterDockerFlags(flags *pflag.FlagSet) {
-	l.dockerFlags = flags
 }
 
 // dockerCLI is a Mutagen-aware Docker CLI implementation.
@@ -103,6 +98,11 @@ func (l *Liaison) RegisterComposeService(service api.Service) {
 // with RegisterComposeService.
 func (l *Liaison) ComposeService() api.Service {
 	return &composeService{liaison: l, service: l.composeService}
+}
+
+// RegisterDockerFlags registers the associated Docker command line flags.
+func (l *Liaison) RegisterDockerFlags(flags *pflag.FlagSet) {
+	l.dockerFlags = flags
 }
 
 // processProject loads Mutagen configuration from the specified project, adds

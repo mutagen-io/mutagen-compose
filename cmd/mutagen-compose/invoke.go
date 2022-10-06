@@ -41,16 +41,15 @@ func invokeCompose(liaison *mutagen.Liaison) {
 	plugin.Run(func(dockerCli command.Cli) *cobra.Command {
 		liaison.RegisterDockerCLI(dockerCli)
 		liaisedCli := liaison.DockerCLI()
-		lazyInit := api.NewServiceProxy()
-		cmd := commands.RootCommand(liaisedCli, lazyInit)
+		liaison.RegisterComposeService(compose.NewComposeService(liaisedCli))
+		serviceProxy := api.NewServiceProxy().WithService(liaison.ComposeService())
+		cmd := commands.RootCommand(liaisedCli, serviceProxy)
 		originalPreRun := cmd.PersistentPreRunE
 		cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 			if err := plugin.PersistentPreRunE(cmd, args); err != nil {
 				return err
 			}
 			liaison.RegisterDockerFlags(cmd.Root().Flags())
-			liaison.RegisterComposeService(compose.NewComposeService(liaisedCli))
-			lazyInit.WithService(liaison.ComposeService())
 			if originalPreRun != nil {
 				return originalPreRun(cmd, args)
 			}
@@ -66,6 +65,7 @@ func invokeCompose(liaison *mutagen.Liaison) {
 		adjustUnknownCommandErrors(cmd)
 		adjustVersionCommand(cmd)
 		cmd.AddCommand(legalCommand)
+		cmd.AddCommand(generateCommand)
 		return cmd
 	},
 		manager.Metadata{

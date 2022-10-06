@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/mutagen-io/mutagen/cmd/external"
@@ -13,12 +14,27 @@ import (
 	"github.com/mutagen-io/mutagen-compose/pkg/mutagen"
 )
 
+// isCobraShellCompletionCommand returns true if the argument names a hidden
+// Cobra shell completion command.
+func isCobraShellCompletionCommand(argument string) bool {
+	return argument == cobra.ShellCompRequestCmd ||
+		argument == cobra.ShellCompNoDescRequestCmd
+}
+
 func init() {
 	// Set flags for invoking Mutagen cmd packages externally.
 	external.UsePathBasedLookupForDaemonStart = true
 }
 
 func main() {
+	// If command line completion is being requested, then remove the completion
+	// command argument before parsing.
+	var completionCommand string
+	if len(os.Args) > 1 && isCobraShellCompletionCommand(os.Args[1]) {
+		completionCommand = os.Args[1]
+		os.Args = append(os.Args[:1], os.Args[2:]...)
+	}
+
 	// Create storage for top-level Docker and Compose flags.
 	dockerFlags := &docker.Flags{}
 	composeFlags := &compose.Flags{}
@@ -76,6 +92,9 @@ func main() {
 	// Compute the emulated arguments that we'll use for the plugin-based
 	// invocation of Compose.
 	emulatedArgs := []string{"docker"}
+	if completionCommand != "" {
+		emulatedArgs = append(emulatedArgs, completionCommand)
+	}
 	if help {
 		emulatedArgs = append(emulatedArgs, "--help")
 	}
