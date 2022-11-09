@@ -3,9 +3,9 @@ package mutagen
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/docker/docker/api/types"
+	containerAPITypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 )
 
@@ -104,7 +104,7 @@ func (c *dockerAPIClient) ContainerUnpause(ctx context.Context, container string
 
 // ContainerStop implements
 // github.com/docker/docker/client.APIClient.ContainerStop.
-func (c *dockerAPIClient) ContainerStop(ctx context.Context, container string, timeout *time.Duration) error {
+func (c *dockerAPIClient) ContainerStop(ctx context.Context, container string, options containerAPITypes.StopOptions) error {
 	// If this is a Mutagen compose sidecar container, then pause associated
 	// Mutagen sessions.
 	if sidecar, err := c.isMutagenComposeSidecar(ctx, container); err != nil {
@@ -116,7 +116,7 @@ func (c *dockerAPIClient) ContainerStop(ctx context.Context, container string, t
 	}
 
 	// Stop the container.
-	return c.APIClient.ContainerStop(ctx, container, timeout)
+	return c.APIClient.ContainerStop(ctx, container, options)
 }
 
 // ContainerRemove implements
