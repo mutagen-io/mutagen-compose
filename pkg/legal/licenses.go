@@ -172,7 +172,23 @@ go-version
 
 https://github.com/hashicorp/go-version
 
+Copyright (c) 2014 HashiCorp, Inc.
+
 A copy of the go-version source code can be obtained at the above URL.
+
+Used under the terms of the Mozilla Public License, Version 2.0. A copy of this
+license can be found later in this text or online at
+http://mozilla.org/MPL/2.0/.
+
+--------------------------------------------------------------------------------
+
+HCL
+
+https://github.com/hashicorp/hcl
+
+Copyright (c) 2014 HashiCorp, Inc.
+
+A copy of the HCL source code can be obtained at the above URL.
 
 Used under the terms of the Mozilla Public License, Version 2.0. A copy of this
 license can be found later in this text or online at
@@ -229,28 +245,6 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
-jsonpointer
-
-https://github.com/qri-io/jsonpointer
-
-Copyright (c) 2017 Brendan O'Brien
-
-Used under the terms of the MIT License. A copy of this license can be found
-later in this text or online at https://opensource.org/licenses/MIT.
-
---------------------------------------------------------------------------------
-
-jsonschema
-
-https://github.com/qri-io/jsonschema
-
-Copyright (c) 2017 Brendan O'Brien
-
-Used under the terms of the MIT License. A copy of this license can be found
-later in this text or online at https://opensource.org/licenses/MIT.
-
---------------------------------------------------------------------------------
-
 json-iterator
 
 https://github.com/json-iterator/go
@@ -259,19 +253,6 @@ Copyright (c) 2016 json-iterator
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
-
---------------------------------------------------------------------------------
-
-JSON Canonicalization
-
-https://github.com/cyberphone/json-canonicalization
-
-Copyright 2006-2019 WebPKI.org (http://webpki.org).
-Copyright 2018 Anders Rundgren
-
-Used under the terms of the Apache License, Version 2.0. A copy of this license
-can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
@@ -872,17 +853,6 @@ version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
 --------------------------------------------------------------------------------
 
-SemVer
-
-https://github.com/Masterminds/semver
-
-Copyright (C) 2014-2019, Matt Butcher and Matt Farina
-
-Used under the terms of the MIT License. A copy of this license can be found
-later in this text or online at https://opensource.org/licenses/MIT.
-
---------------------------------------------------------------------------------
-
 logr
 
 https://github.com/go-logr/logr
@@ -1139,6 +1109,15 @@ Distribution
 https://github.com/distribution/distribution
 
 Copyright Distribution contributors
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright The containerd Authors.
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1541,29 +1520,6 @@ version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
 --------------------------------------------------------------------------------
 
-cnab-go
-
-https://github.com/cnabio/cnab-go
-
-Copyright (c) The CNAB Authors. All rights reserved.
-
-Used under the terms of the MIT License. A copy of this license can be found
-later in this text or online at https://opensource.org/licenses/MIT.
-
---------------------------------------------------------------------------------
-
-CNAB to OCI
-
-https://github.com/cnabio/cnab-to-oci
-
-Copyright 2013-2018 Docker, Inc.
-
-Used under the terms of the Apache License, Version 2.0. A copy of this license
-can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
---------------------------------------------------------------------------------
-
 OpenTelemetry-Go Contrib
 
 https://github.com/open-telemetry/opentelemetry-go-contrib
@@ -1617,7 +1573,7 @@ OCI Image Format Specification
 
 https://github.com/opencontainers/image-spec
 
-Copyright 2016 The Linux Foundation.
+Copyright 2016-2022 The Linux Foundation
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
