@@ -375,11 +375,17 @@ func (s *composeService) Events(ctx context.Context, projectName string, options
 }
 
 // Port implements github.com/docker/compose/v2/pkg/api.Service.Port.
-func (s *composeService) Port(ctx context.Context, projectName string, service string, port int, options api.PortOptions) (string, int, error) {
+func (s *composeService) Port(ctx context.Context, projectName string, service string, port uint16, options api.PortOptions) (string, int, error) {
 	return s.service.Port(ctx, projectName, service, port, options)
 }
 
 // Images implements github.com/docker/compose/v2/pkg/api.Service.Images.
 func (s *composeService) Images(ctx context.Context, projectName string, options api.ImagesOptions) ([]api.ImageSummary, error) {
 	return s.service.Images(ctx, projectName, options)
+}
+
+// MaxConcurrency implements
+// github.com/docker/compose/v2/pkg/api.Service.MaxConcurrency.
+func (s *composeService) MaxConcurrency(parallel int) {
+	s.service.MaxConcurrency(parallel)
 }
