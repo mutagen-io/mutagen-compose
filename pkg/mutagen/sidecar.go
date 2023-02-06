@@ -40,6 +40,10 @@ func init() {
 	sidecarImage = sidecar.BaseTag + ":" + mutagen.Version
 }
 
+// sidecarCapabilities are the capability specifications needed to enable
+// sidecar features.
+var sidecarCapabilities = []string{"SYS_ADMIN", "DAC_READ_SEARCH"}
+
 // reifySidecarURLIfNecessary converts a sidecar URL to a reified Docker URL
 // using information from the specified Docker CLI flags, Docker CLI, and
 // sidecar container ID. If the target URL is not a sidecar URL, then this
