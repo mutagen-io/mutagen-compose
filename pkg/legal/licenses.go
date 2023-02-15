@@ -148,6 +148,8 @@ errwrap
 
 https://github.com/hashicorp/errwrap
 
+Copyright (c) 2014 HashiCorp, Inc.
+
 A copy of the errwrap source code can be obtained at the above URL.
 
 Used under the terms of the Mozilla Public License, Version 2.0. A copy of this
@@ -159,6 +161,8 @@ http://mozilla.org/MPL/2.0/.
 go-multierror
 
 https://github.com/hashicorp/go-multierror
+
+Copyright (c) 2014 HashiCorp, Inc.
 
 A copy of the go-multierror source code can be obtained at the above URL.
 
