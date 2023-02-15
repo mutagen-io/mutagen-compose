@@ -438,8 +438,13 @@ func (l *Liaison) processProject(project *types.Project) error {
 	image := sidecarImage
 	var capabilities []string
 	if xMutagen.Sidecar.Features == "" {
-		image += enhancedTagSuffix
-		capabilities = enhancedCapabilities
+		if useSSPLSidecarByDefault {
+			image += ssplSidecarImageTagSuffix
+			capabilities = ssplSidecarCapabilities
+		}
+	} else if xMutagen.Sidecar.Features == "sspl" {
+		image += ssplSidecarImageTagSuffix
+		capabilities = ssplSidecarCapabilities
 	} else if xMutagen.Sidecar.Features != "standard" {
 		return fmt.Errorf("invalid sidecar feature level specification: %s", xMutagen.Sidecar.Features)
 	}

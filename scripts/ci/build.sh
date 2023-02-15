@@ -35,15 +35,17 @@ if [[ "${MUTAGEN_OS_NAME}" == "darwin" ]]; then
         rm "${MUTAGEN_CERTIFICATE_AND_KEY_PATH}"
         security set-key-partition-list -S apple-tool:,apple: -s -k "${MUTAGEN_KEYCHAIN_PASSWORD}" "${MUTAGEN_KEYCHAIN_PATH}" > /dev/null
 
-        # Perform a full release build with code signing.
-        go run scripts/build.go --mode=release --macos-codesign-identity="${MACOS_CODESIGN_IDENTITY}"
+        # Perform a full release build with code signing. We enable
+        # SSPL-licensed extensions by default.
+        go run scripts/build.go --mode=release --sspl --macos-codesign-identity="${MACOS_CODESIGN_IDENTITY}"
 
         # Reset the default keychain and remove the temporary keychain.
         security default-keychain -s "${PREVIOUS_DEFAULT_KEYCHAIN}"
         security delete-keychain "${MUTAGEN_KEYCHAIN_PATH}"
     else
-        # Perform a full release build without code signing.
-        go run scripts/build.go --mode=release
+        # Perform a full release build without code signing. We enable
+        # SSPL-licensed extensions by default.
+        go run scripts/build.go --mode=release --sspl
     fi
 
     # Determine the Mutagen version.
@@ -69,6 +71,6 @@ if [[ "${MUTAGEN_OS_NAME}" == "darwin" ]]; then
     zip "build/release/mutagen-compose_windows_arm64_v${MUTAGEN_VERSION}.zip" mutagen-compose.exe
     rm mutagen-compose.exe
 else
-    # Perform a local build.
-    go run scripts/build.go --mode=local
+    # Perform a local build. We enable SSPL-licensed extensions by default.
+    go run scripts/build.go --mode=local --sspl
 fi

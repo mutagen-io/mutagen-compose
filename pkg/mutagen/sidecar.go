@@ -32,13 +32,22 @@ const (
 	sidecarVersionLabelKey = "io.mutagen.compose.version"
 )
 
-// sidecarImage is the full Mutagen sidecar image tag.
+// sidecarImage is the full Mutagen sidecar image tag. This sidecar image will
+// include only MIT-licensed Mutagen code.
 var sidecarImage string
 
 func init() {
 	// Compute the sidecar image tag.
 	sidecarImage = sidecar.BaseTag + ":" + mutagen.Version
 }
+
+// ssplSidecarImageTagSuffix is the suffix to append to the sidecar image name
+// to identify the SSPL-licensed sidecar image.
+const ssplSidecarImageTagSuffix = "-sspl"
+
+// ssplSidecarCapabilities are the capability specifications needed to enable
+// enhanced sidecar features with the SSPL-licensed sidecar image.
+var ssplSidecarCapabilities = []string{"SYS_ADMIN", "DAC_READ_SEARCH"}
 
 // reifySidecarURLIfNecessary converts a sidecar URL to a reified Docker URL
 // using information from the specified Docker CLI flags, Docker CLI, and
