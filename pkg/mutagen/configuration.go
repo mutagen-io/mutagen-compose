@@ -8,9 +8,6 @@ import (
 // sidecarConfiguration encodes sidecar service configuration.
 type sidecarConfiguration struct {
 	// Features controls the sidecar feature set.
-	//
-	// Deprecated: This field is no longer used because all builds now target
-	// the sidecar image with SSPL-licensed enhancements.
 	Features string `mapstructure:"features"`
 	// Restart is the restart policy for the sidecar container.
 	Restart string `mapstructure:"restart"`

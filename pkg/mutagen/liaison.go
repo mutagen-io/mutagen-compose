@@ -432,6 +432,18 @@ func (l *Liaison) processProject(project *types.Project) error {
 		})
 	}
 
+	// Determine the target sidecar image. At the moment, the only supported
+	// feature specification is "standard", though we may include more granular
+	// feature sets in the future. We default to the enhanced feature set.
+	image := sidecarImage
+	var capabilities []string
+	if xMutagen.Sidecar.Features == "" {
+		image += enhancedTagSuffix
+		capabilities = enhancedCapabilities
+	} else if xMutagen.Sidecar.Features != "standard" {
+		return fmt.Errorf("invalid sidecar feature level specification: %s", xMutagen.Sidecar.Features)
+	}
+
 	// Load the Compose version information.
 	versions, err := version.LoadVersions()
 	if err != nil {
@@ -446,14 +458,14 @@ func (l *Liaison) processProject(project *types.Project) error {
 	// solely on label filtering (see composeService.getContainers).
 	l.mutagenService = types.ServiceConfig{
 		Name:  sidecarServiceName,
-		Image: sidecarImage,
+		Image: image,
 		Labels: types.Labels{
 			sidecarRoleLabelKey:    sidecarRoleLabelValue,
 			sidecarVersionLabelKey: mutagen.Version,
 		},
 		Networks: networkDependencies,
 		Volumes:  serviceVolumeDependencies,
-		CapAdd:   sidecarCapabilities,
+		CapAdd:   capabilities,
 		CustomLabels: types.Labels{
 			api.ProjectLabel:     project.Name,
 			api.ServiceLabel:     sidecarServiceName,
