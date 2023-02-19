@@ -139,7 +139,7 @@ Copyright (c) 2015, Dave Cheney <dave@cheney.net>
 All rights reserved.
 
 Used under the terms of the 2-Clause BSD License. A copy of this license can be
-found later in this text and a templated version can be found online at
+found later in this text or online at
 https://opensource.org/licenses/BSD-2-Clause.
 
 --------------------------------------------------------------------------------
@@ -483,6 +483,31 @@ later in this text or online at https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
+xxh3 (xxHash Library)
+
+https://github.com/zeebo/xxh3
+
+Copyright (c) 2012-2014, Yann Collet
+Copyright (c) 2019, Jeff Wendling
+All rights reserved.
+
+Used under the terms of the 2-Clause BSD License. A copy of this license can be
+found later in this text or online at
+https://opensource.org/licenses/BSD-2-Clause.
+
+--------------------------------------------------------------------------------
+
+cpuid
+
+http://github.com/klauspost/cpuid
+
+Copyright (c) 2015 Klaus Post
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
 go-acl
 
 https://github.com/hectane/go-acl
@@ -814,14 +839,8 @@ Forked and modified at https://github.com/mutagen-io/gopass.
 
 Copyright (c) 2012 Chris Howey
 
-Portions of this package are derived from Solaris sources distributed under the
-Common Development and Distribution License, Version 1.0. These portions are
-consequently released under the same license. Copies of the license are
-available in the above repositories.
-
-The remainder of the package is used under the terms of the ISC License. A copy
-of this license can be found later in this text or online at
-https://opensource.org/licenses/ISC.
+Used under the terms of the ISC License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/ISC.
 
 --------------------------------------------------------------------------------
 
@@ -1320,9 +1339,9 @@ statements:
 Copyright (c) 2013, The GoGo Authors. All rights reserved.
 http://github.com/gogo/protobuf
 
-These portions are used under the terms of the 2-Clause BSD License. A copy of
-this license can be found later in this text and a templated version can be
-found online at https://opensource.org/licenses/BSD-2-Clause.
+Used under the terms of the 2-Clause BSD License. A copy of this license can be
+found later in this text or online at
+https://opensource.org/licenses/BSD-2-Clause.
 
 --------------------------------------------------------------------------------
 
@@ -1817,8 +1836,11 @@ compress
 
 https://github.com/klauspost/compress
 
-Copyright 2009 The Go Authors. All rights reserved.
-Copyright (c) 2019 Klaus Post. All rights reserved.
+Copyright (c) 2009-2016 The Go Authors. All rights reserved.
+Copyright (c) 2015-2019 Klaus Post. All rights reserved.
+Copyright 2011 The Snappy-Go Authors. All rights reserved.
+Based on work Copyright (c) 2013, Yann Collet, released under BSD License.
+Based on work by Yann Collet, released under BSD License.
 
 Used under the terms of the 3-Clause BSD License (Google version). A copy of
 this license can be found later in this text and a templated version can be
@@ -1908,7 +1930,7 @@ Copyright (c) 2014 Cenk Altı
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
-
+` + licensesSSPL + `
 
 ================================================================================
 Mutagen Compose and its dependencies make use of the following licenses:
@@ -1933,6 +1955,31 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+2-Clause BSD License
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice, this
+  list of conditions and the following disclaimer in the documentation and/or
+  other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
@@ -2140,31 +2187,6 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------------------
-
-2-Clause BSD License
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
@@ -2750,4 +2772,4 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-`
+` + licenseTextSSPL
