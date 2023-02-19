@@ -479,7 +479,7 @@ func build() error {
 	// Build binaries.
 	log.Println("Building binaries...")
 	for _, target := range activeTargets {
-		log.Println("Build for", target)
+		log.Println("Building for", target)
 		executableBuildPath := filepath.Join(composeBuildSubdirectoryPath, target.Name())
 		if err := target.Build(composePackage, executableBuildPath, enableSSPLEnhancements, ldflags); err != nil {
 			return fmt.Errorf("unable to build Mutagen Compose: %w", err)
