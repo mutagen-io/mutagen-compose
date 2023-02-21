@@ -130,9 +130,19 @@ func (t Target) IncludeInSlimBuildModes() bool {
 
 // Build executes a module-aware build of the specified package URL, storing the
 // output of the build at the specified path.
-func (t Target) Build(url, output string, ldflags string) error {
+func (t Target) Build(url, output string, enableSSPLEnhancements bool, ldflags string) error {
 	// Compute the build command.
 	arguments := []string{"build", "-o", output, "-trimpath"}
+	var tags []string
+	if url == composePackage {
+		tags = append(tags, "mutagencompose")
+	}
+	if enableSSPLEnhancements {
+		tags = append(tags, "mutagensspl")
+	}
+	if len(tags) > 0 {
+		arguments = append(arguments, "-tags", strings.Join(tags, ","))
+	}
 	if ldflags != "" {
 		arguments = append(arguments, "-ldflags="+ldflags)
 	}
@@ -356,7 +366,7 @@ func copyFile(sourcePath, destinationPath string) error {
 	return nil
 }
 
-var usage = `usage: build [-h|--help] [-m|--mode=<mode>]
+var usage = `usage: build [-h|--help] [-m|--mode=<mode>] [--sspl]
        [--macos-codesign-identity=<identity>]
 
 The mode flag accepts three values: 'local', 'slim', and 'release'. 'local' will
@@ -377,8 +387,10 @@ func build() error {
 	flagSet := pflag.NewFlagSet("build", pflag.ContinueOnError)
 	flagSet.SetOutput(io.Discard)
 	var mode, macosCodesignIdentity string
+	var enableSSPLEnhancements bool
 	flagSet.StringVarP(&mode, "mode", "m", "local", "specify the build mode")
 	flagSet.StringVar(&macosCodesignIdentity, "macos-codesign-identity", "", "specify the macOS code signing identity")
+	flagSet.BoolVar(&enableSSPLEnhancements, "sspl", false, "enable SSPL-licensed enhancements")
 	if err := flagSet.Parse(os.Args[1:]); err != nil {
 		if err == pflag.ErrHelp {
 			fmt.Fprint(os.Stdout, usage)
@@ -467,9 +479,9 @@ func build() error {
 	// Build binaries.
 	log.Println("Building binaries...")
 	for _, target := range activeTargets {
-		log.Println("Build for", target)
+		log.Println("Building for", target)
 		executableBuildPath := filepath.Join(composeBuildSubdirectoryPath, target.Name())
-		if err := target.Build(composePackage, executableBuildPath, ldflags); err != nil {
+		if err := target.Build(composePackage, executableBuildPath, enableSSPLEnhancements, ldflags); err != nil {
 			return fmt.Errorf("unable to build Mutagen Compose: %w", err)
 		}
 		if macosCodesignIdentity != "" && target.GOOS == "darwin" {
