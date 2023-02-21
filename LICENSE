@@ -1,3 +1,13 @@
+Unless otherwise specified, all code in this repository is made available under
+the terms of the MIT License, the text of which can be found below.
+
+From Mutagen and Mutagen Compose v0.17 onward, SSPL-licensed code is included by
+default in official release builds. Users wishing to create a release build with
+only MIT-licensed and non-copyleft-licensed code can do so by running the build
+script and omitting the --sspl flag.
+
+--------------------------------------------------------------------------------
+
 MIT License
 
 Copyright (c) 2020-present Mutagen IO, Inc.
