@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -422,7 +423,11 @@ func (l *Liaison) processProject(project *types.Project) error {
 		}
 	}
 
-	// Convert volume dependencies to the Compose format.
+	// Convert volume dependencies to the Compose format. We need to ensure that
+	// volume dependencies are ordered consistently (which they won't be due to
+	// Go's random map iteration order), otherwise Compose will recreate the
+	// service. Note that this same logic doesn't apply to network dependencies
+	// because Compose specifies them as a map (and must sort them internally).
 	serviceVolumeDependencies := make([]types.ServiceVolumeConfig, 0, len(volumeDependencies))
 	for volume := range volumeDependencies {
 		serviceVolumeDependencies = append(serviceVolumeDependencies, types.ServiceVolumeConfig{
@@ -431,6 +436,9 @@ func (l *Liaison) processProject(project *types.Project) error {
 			Target: mountPathForVolumeInMutagenContainer(daemonMetadata.OSType, volume),
 		})
 	}
+	sort.Slice(serviceVolumeDependencies, func(i, j int) bool {
+		return serviceVolumeDependencies[i].Source < serviceVolumeDependencies[j].Source
+	})
 
 	// Determine the target sidecar image. At the moment, the only supported
 	// feature specification is "standard", though we may include more granular
