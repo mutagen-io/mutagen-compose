@@ -59,16 +59,14 @@ For updates about the project and its releases, you can
 
 Mutagen Compose is built and tested on Windows, macOS, and Linux.
 
-| Tests                               | Report card                         | License                                   |
-| :---------------------------------: | :---------------------------------: | :---------------------------------------: |
-| [![Tests][tests-badge]][tests-link] | [![Report card][rc-badge]][rc-link] | [![License][license-badge]][license-link] |
+| Tests                               | Report card                         |
+| :---------------------------------: | :---------------------------------: |
+| [![Tests][tests-badge]][tests-link] | [![Report card][rc-badge]][rc-link] |
 
 [tests-badge]: https://github.com/mutagen-io/mutagen-compose/workflows/CI/badge.svg "Test status"
 [tests-link]: https://github.com/mutagen-io/mutagen-compose/actions "Test status"
 [rc-badge]: https://goreportcard.com/badge/github.com/mutagen-io/mutagen-compose "Report card status"
 [rc-link]: https://goreportcard.com/report/github.com/mutagen-io/mutagen-compose "Report card status"
-[license-badge]: https://img.shields.io/github/license/mutagen-io/mutagen-compose.svg "MIT licensed"
-[license-link]: LICENSE "MIT licensed"
 
 
 ## Contributing
