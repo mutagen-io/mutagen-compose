@@ -98,8 +98,12 @@ func (t Target) appendGoEnv(environment []string) []string {
 	environment = append(environment, fmt.Sprintf("GOOS=%s", t.GOOS))
 	environment = append(environment, fmt.Sprintf("GOARCH=%s", t.GOARCH))
 
-	// Disable cgo.
-	environment = append(environment, "CGO_ENABLED=0")
+	// Keep cgo enabled only for darwin, as it's required for building github.com/fsnotify/fsevents.
+	if t.GOOS == "darwin" {
+		environment = append(environment, "CGO_ENABLED=1")
+	} else {
+		environment = append(environment, "CGO_ENABLED=0")
+	}
 
 	// Set up ARM target support. See notes for definition of minimumARMSupport.
 	// We don't need to unset any existing GOARM variables since they simply

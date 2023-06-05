@@ -295,9 +295,9 @@ func (s *composeService) List(ctx context.Context, options api.ListOptions) ([]a
 	return s.service.List(ctx, options)
 }
 
-// Convert implements github.com/docker/compose/v2/pkg/api.Service.Convert.
-func (s *composeService) Convert(ctx context.Context, project *types.Project, options api.ConvertOptions) ([]byte, error) {
-	return s.service.Convert(ctx, project, options)
+// Config implements github.com/docker/compose/v2/pkg/api.Service.Config.
+func (s *composeService) Config(ctx context.Context, project *types.Project, options api.ConfigOptions) ([]byte, error) {
+	return s.service.Config(ctx, project, options)
 }
 
 // Kill implements github.com/docker/compose/v2/pkg/api.Service.Kill.
@@ -305,8 +305,7 @@ func (s *composeService) Kill(ctx context.Context, projectName string, options a
 	return s.service.Kill(ctx, projectName, options)
 }
 
-// RunOneOffContainer implements
-// github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
+// RunOneOffContainer implements github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
 func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.Project, options api.RunOptions) (int, error) {
 	// The run command won't invoke Start unless the target service has a
 	// non-zero number of dependenies to start (though it will invariably invoke
@@ -384,8 +383,27 @@ func (s *composeService) Images(ctx context.Context, projectName string, options
 	return s.service.Images(ctx, projectName, options)
 }
 
-// MaxConcurrency implements
-// github.com/docker/compose/v2/pkg/api.Service.MaxConcurrency.
+// MaxConcurrency implements github.com/docker/compose/v2/pkg/api.Service.MaxConcurrency.
 func (s *composeService) MaxConcurrency(parallel int) {
 	s.service.MaxConcurrency(parallel)
+}
+
+// DryRunMode implements github.com/docker/compose/v2/pkg/api.Service.DryRunMode.
+func (s *composeService) DryRunMode(ctx context.Context, dryRun bool) (context.Context, error) {
+	return s.service.DryRunMode(ctx, dryRun)
+}
+
+// Watch implements github.com/docker/compose/v2/pkg/api.Service.Watch.
+func (s *composeService) Watch(ctx context.Context, project *types.Project, services []string, options api.WatchOptions) error {
+	return s.service.Watch(ctx, project, services, options)
+}
+
+// Viz implements github.com/docker/compose/v2/pkg/api.Service.Viz.
+func (s *composeService) Viz(ctx context.Context, project *types.Project, options api.VizOptions) (string, error) {
+	return s.service.Viz(ctx, project, options)
+}
+
+// Wait implements github.com/docker/compose/v2/pkg/api.Service.Wait.
+func (s *composeService) Wait(ctx context.Context, projectName string, options api.WaitOptions) (int64, error) {
+	return s.service.Wait(ctx, projectName, options)
 }
