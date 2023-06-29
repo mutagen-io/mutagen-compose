@@ -8,7 +8,7 @@ require (
 	github.com/docker/compose/v2 v2.15.1
 	github.com/docker/docker v20.10.20+incompatible
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/mutagen-io/mutagen v0.17.1
+	github.com/mutagen-io/mutagen v0.17.2
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 )
@@ -88,7 +88,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/mutagen-io/extstat v0.0.0-20210224131814-32fa3f057fa8 // indirect
-	github.com/mutagen-io/fsevents v0.0.0-20180903111129-10556809b434 // indirect
+	github.com/mutagen-io/fsevents v0.0.0-20230629001834-f53e17b91ebc // indirect
 	github.com/mutagen-io/gopass v0.0.0-20230214181532-d4b7cdfe054c // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
