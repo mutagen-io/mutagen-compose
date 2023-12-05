@@ -12,6 +12,8 @@ type Flags struct {
 	ansi string
 	// compatibility indicates the presence of the --compatibility flag.
 	compatibility bool
+	// dryRun indicates the presence of the --dry-run flag.
+	dryRun bool
 	// envFile stores the value of the --env-file flag.
 	envFile string
 	// files stores the value(s) of the -f/--file flag(s).
@@ -28,6 +30,7 @@ type Flags struct {
 func (f *Flags) Register(flags *pflag.FlagSet) {
 	flags.StringVar(&f.ansi, "ansi", "", "")
 	flags.BoolVar(&f.compatibility, "compatibility", false, "")
+	flags.BoolVar(&f.dryRun, "dry-run", false, "")
 	flags.StringVar(&f.envFile, "env-file", "", "")
 	flags.StringSliceVarP(&f.files, "file", "f", nil, "")
 	flags.StringSliceVar(&f.profiles, "profile", nil, "")
@@ -45,6 +48,9 @@ func (f *Flags) Reconstituted(flags *pflag.FlagSet) (result []string) {
 	}
 	if flags.Lookup("compatibility").Changed {
 		result = append(result, fmt.Sprintf("--compatibility=%t", f.compatibility))
+	}
+	if flags.Lookup("dry-run").Changed {
+		result = append(result, fmt.Sprintf("--dry-run=%t", f.dryRun))
 	}
 	if flags.Lookup("env-file").Changed {
 		result = append(result, "--env-file", f.envFile)
