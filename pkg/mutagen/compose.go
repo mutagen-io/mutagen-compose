@@ -378,6 +378,11 @@ func (s *composeService) Port(ctx context.Context, projectName string, service s
 	return s.service.Port(ctx, projectName, service, port, options)
 }
 
+// Publish implements github.com/docker/compose/v2/pkg/api.Service.Publish.
+func (s *composeService) Publish(ctx context.Context, project *types.Project, repository string, options api.PublishOptions) error {
+	return s.service.Publish(ctx, project, repository, options)
+}
+
 // Images implements github.com/docker/compose/v2/pkg/api.Service.Images.
 func (s *composeService) Images(ctx context.Context, projectName string, options api.ImagesOptions) ([]api.ImageSummary, error) {
 	return s.service.Images(ctx, projectName, options)
@@ -406,4 +411,9 @@ func (s *composeService) Viz(ctx context.Context, project *types.Project, option
 // Wait implements github.com/docker/compose/v2/pkg/api.Service.Wait.
 func (s *composeService) Wait(ctx context.Context, projectName string, options api.WaitOptions) (int64, error) {
 	return s.service.Wait(ctx, projectName, options)
+}
+
+// Scale implements github.com/docker/compose/v2/pkg/api.Service.Scale.
+func (s *composeService) Scale(ctx context.Context, project *types.Project, options api.ScaleOptions) error {
+	return s.service.Scale(ctx, project, options)
 }
