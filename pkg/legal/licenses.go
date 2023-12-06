@@ -1128,6 +1128,7 @@ Docker Compose
 https://github.com/docker/compose
 
 Copyright 2020 Docker Compose CLI authors
+Copyright 2018 The Tilt Dev Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1137,6 +1138,15 @@ Docker Compose V2
 Copyright 2020 Docker Compose authors
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2014 Adrian-George Bostan <adrg@epistack.com>
+
+These portions are used under the terms of the MIT License. A copy of this
+license can be found later in this text or online at
+https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
