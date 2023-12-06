@@ -1045,6 +1045,30 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
+aws-sdk-go-v2
+
+https://github.com/aws/aws-sdk-go-v2
+
+AWS SDK for Go
+Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2014-2015 Stripe, Inc.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
 buildx
 
 https://github.com/docker/buildx
