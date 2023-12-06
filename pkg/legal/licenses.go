@@ -617,23 +617,13 @@ These portions are used under the terms of the 3-Clause BSD License (Google
 version). A copy of this license can be found later in this text and a templated
 version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright (c) 2015, Google Inc.
-Copyright 2018 Google LLC.
-
-These portions are used under the terms of the Apache License, Version 2.0. A
-copy of this license can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
 --------------------------------------------------------------------------------
 
 gnostic
 
-https://github.com/googleapis/gnostic
+https://github.com/google/gnostic
 
-Copyright 2017-2020, Google LLC.
+Copyright 2017-2021, Google LLC.
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1127,33 +1117,15 @@ This product includes software developed at Docker, Inc. (https://www.docker.com
 
 --------------------------------------------------------------------------------
 
-Distribution
+Distribution reference
 
-https://github.com/distribution/distribution
+https://github.com/distribution/reference
 
 Copyright Distribution contributors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
 http://www.apache.org/licenses/LICENSE-2.0.
-
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright The containerd Authors.
-
-Used under the terms of the Apache License, Version 2.0. A copy of this license
-can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright (c) 2013 Damien Le Berrigaud and Nick Wade
-
-These portions are used under the terms of the MIT License. A copy of this
-license can be found later in this text or online at
-https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
@@ -1360,18 +1332,6 @@ http://www.apache.org/licenses/LICENSE-2.0.
 continuity
 
 https://github.com/containerd/continuity
-
-Copyright The containerd Authors.
-
-Used under the terms of the Apache License, Version 2.0. A copy of this license
-can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
---------------------------------------------------------------------------------
-
-ttrpc
-
-https://github.com/containerd/ttrpc
 
 Copyright The containerd Authors.
 
