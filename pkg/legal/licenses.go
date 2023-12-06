@@ -25,8 +25,8 @@ later in this text or online at https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
-Go, the Go standard library, the Go crypto, net, oauth2, sync, sys, term, text,
-and time subrepositories, modified code from the Go standard library, and
+Go, the Go standard library, the Go crypto, exp, net, oauth2, sync, sys, term,
+text, and time subrepositories, modified code from the Go standard library, and
 modified code from the build, sys, and exp subrepositories.
 
 https://golang.org/
@@ -961,6 +961,7 @@ http://www.apache.org/licenses/LICENSE-2.0.
 Portions of this package are derived from sources with the following copyright
 statements:
 
+Copyright (c) 2009 The Go Authors. All rights reserved.
 Copyright 2020 The Go Authors. All rights reserved.
 
 These portions are used under the terms of the 3-Clause BSD License (Google
@@ -1677,6 +1678,7 @@ Prometheus common components and libraries
 https://github.com/prometheus/common
 
 Copyright 2015 The Prometheus Authors
+Copyright 2020 The Prometheus-operator Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
