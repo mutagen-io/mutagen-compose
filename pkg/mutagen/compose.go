@@ -23,6 +23,12 @@ func appendServiceByCopy(services types.Services, service types.ServiceConfig) t
 	return result
 }
 
+// isDryRun determines if Compose is running in dry-run mode.
+func isDryRun(ctx context.Context) bool {
+	dryRun, ok := ctx.Value(api.DryRunKey{}).(bool)
+	return ok && dryRun
+}
+
 // composeService is a Mutagen-aware implementation of
 // github.com/docker/compose/v2/pkg/api.Service that injects Mutagen services
 // and dependencies into the project.
@@ -47,6 +53,11 @@ func (s *composeService) Push(ctx context.Context, project *types.Project, optio
 
 // Pull implements github.com/docker/compose/v2/pkg/api.Service.Pull.
 func (s *composeService) Pull(ctx context.Context, project *types.Project, options api.PullOptions) error {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.Pull(ctx, project, options)
+	}
+
 	// Process Mutagen extensions for the project.
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
@@ -70,6 +81,11 @@ func (s *composeService) Pull(ctx context.Context, project *types.Project, optio
 
 // Create implements github.com/docker/compose/v2/pkg/api.Service.Create.
 func (s *composeService) Create(ctx context.Context, project *types.Project, options api.CreateOptions) error {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.Create(ctx, project, options)
+	}
+
 	// Process Mutagen extensions for the project.
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
@@ -111,6 +127,11 @@ func (s *composeService) Create(ctx context.Context, project *types.Project, opt
 
 // Start implements github.com/docker/compose/v2/pkg/api.Service.Start.
 func (s *composeService) Start(ctx context.Context, projectName string, options api.StartOptions) error {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.Start(ctx, projectName, options)
+	}
+
 	// Track start invocation.
 	s.startInvoked = true
 
@@ -149,6 +170,11 @@ func (s *composeService) Stop(ctx context.Context, projectName string, options a
 
 // Up implements github.com/docker/compose/v2/pkg/api.Service.Up.
 func (s *composeService) Up(ctx context.Context, project *types.Project, options api.UpOptions) error {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.Up(ctx, project, options)
+	}
+
 	// Process Mutagen extensions for the project.
 	if err := s.liaison.processProject(project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
@@ -235,6 +261,11 @@ func (s *composeService) Up(ctx context.Context, project *types.Project, options
 
 // Down implements github.com/docker/compose/v2/pkg/api.Service.Down.
 func (s *composeService) Down(ctx context.Context, projectName string, options api.DownOptions) error {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.Down(ctx, projectName, options)
+	}
+
 	// Process Mutagen extensions for the project.
 	if err := s.liaison.processProject(options.Project); err != nil {
 		return fmt.Errorf("unable to process project: %w", err)
@@ -295,9 +326,9 @@ func (s *composeService) List(ctx context.Context, options api.ListOptions) ([]a
 	return s.service.List(ctx, options)
 }
 
-// Convert implements github.com/docker/compose/v2/pkg/api.Service.Convert.
-func (s *composeService) Convert(ctx context.Context, project *types.Project, options api.ConvertOptions) ([]byte, error) {
-	return s.service.Convert(ctx, project, options)
+// Config implements github.com/docker/compose/v2/pkg/api.Service.Config.
+func (s *composeService) Config(ctx context.Context, project *types.Project, options api.ConfigOptions) ([]byte, error) {
+	return s.service.Config(ctx, project, options)
 }
 
 // Kill implements github.com/docker/compose/v2/pkg/api.Service.Kill.
@@ -305,9 +336,13 @@ func (s *composeService) Kill(ctx context.Context, projectName string, options a
 	return s.service.Kill(ctx, projectName, options)
 }
 
-// RunOneOffContainer implements
-// github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
+// RunOneOffContainer implements github.com/docker/compose/v2/pkg/api.Service.RunOneOffContainer.
 func (s *composeService) RunOneOffContainer(ctx context.Context, project *types.Project, options api.RunOptions) (int, error) {
+	// If this is a dry run, then just perform a direct passthrough.
+	if isDryRun(ctx) {
+		return s.service.RunOneOffContainer(ctx, project, options)
+	}
+
 	// The run command won't invoke Start unless the target service has a
 	// non-zero number of dependenies to start (though it will invariably invoke
 	// Create, even in the absence of dependencies, so that other components
@@ -379,13 +414,42 @@ func (s *composeService) Port(ctx context.Context, projectName string, service s
 	return s.service.Port(ctx, projectName, service, port, options)
 }
 
+// Publish implements github.com/docker/compose/v2/pkg/api.Service.Publish.
+func (s *composeService) Publish(ctx context.Context, project *types.Project, repository string, options api.PublishOptions) error {
+	return s.service.Publish(ctx, project, repository, options)
+}
+
 // Images implements github.com/docker/compose/v2/pkg/api.Service.Images.
 func (s *composeService) Images(ctx context.Context, projectName string, options api.ImagesOptions) ([]api.ImageSummary, error) {
 	return s.service.Images(ctx, projectName, options)
 }
 
-// MaxConcurrency implements
-// github.com/docker/compose/v2/pkg/api.Service.MaxConcurrency.
+// MaxConcurrency implements github.com/docker/compose/v2/pkg/api.Service.MaxConcurrency.
 func (s *composeService) MaxConcurrency(parallel int) {
 	s.service.MaxConcurrency(parallel)
+}
+
+// DryRunMode implements github.com/docker/compose/v2/pkg/api.Service.DryRunMode.
+func (s *composeService) DryRunMode(ctx context.Context, dryRun bool) (context.Context, error) {
+	return s.service.DryRunMode(ctx, dryRun)
+}
+
+// Watch implements github.com/docker/compose/v2/pkg/api.Service.Watch.
+func (s *composeService) Watch(ctx context.Context, project *types.Project, services []string, options api.WatchOptions) error {
+	return s.service.Watch(ctx, project, services, options)
+}
+
+// Viz implements github.com/docker/compose/v2/pkg/api.Service.Viz.
+func (s *composeService) Viz(ctx context.Context, project *types.Project, options api.VizOptions) (string, error) {
+	return s.service.Viz(ctx, project, options)
+}
+
+// Wait implements github.com/docker/compose/v2/pkg/api.Service.Wait.
+func (s *composeService) Wait(ctx context.Context, projectName string, options api.WaitOptions) (int64, error) {
+	return s.service.Wait(ctx, projectName, options)
+}
+
+// Scale implements github.com/docker/compose/v2/pkg/api.Service.Scale.
+func (s *composeService) Scale(ctx context.Context, project *types.Project, options api.ScaleOptions) error {
+	return s.service.Scale(ctx, project, options)
 }

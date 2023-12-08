@@ -2,6 +2,7 @@ package compose
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/pflag"
 )
@@ -12,12 +13,18 @@ type Flags struct {
 	ansi string
 	// compatibility indicates the presence of the --compatibility flag.
 	compatibility bool
+	// dryRun indicates the presence of the --dry-run flag.
+	dryRun bool
 	// envFile stores the value of the --env-file flag.
 	envFile string
 	// files stores the value(s) of the -f/--file flag(s).
 	files []string
+	// parallel stores the value of the --parallel flag.
+	parallel int
 	// profiles stores the value(s) of the --profile flag(s).
 	profiles []string
+	// progress stores the value of the --progress flag.
+	progress string
 	// projectDirectory stores the value of the --project-directory flag.
 	projectDirectory string
 	// projectName stores the value of the -p/--project-name flag.
@@ -28,9 +35,12 @@ type Flags struct {
 func (f *Flags) Register(flags *pflag.FlagSet) {
 	flags.StringVar(&f.ansi, "ansi", "", "")
 	flags.BoolVar(&f.compatibility, "compatibility", false, "")
+	flags.BoolVar(&f.dryRun, "dry-run", false, "")
 	flags.StringVar(&f.envFile, "env-file", "", "")
 	flags.StringSliceVarP(&f.files, "file", "f", nil, "")
+	flags.IntVar(&f.parallel, "parallel", -1, "")
 	flags.StringSliceVar(&f.profiles, "profile", nil, "")
+	flags.StringVar(&f.progress, "progress", "auto", "")
 	flags.StringVar(&f.projectDirectory, "project-directory", "", "")
 	flags.StringVarP(&f.projectName, "project-name", "p", "", "")
 }
@@ -46,6 +56,9 @@ func (f *Flags) Reconstituted(flags *pflag.FlagSet) (result []string) {
 	if flags.Lookup("compatibility").Changed {
 		result = append(result, fmt.Sprintf("--compatibility=%t", f.compatibility))
 	}
+	if flags.Lookup("dry-run").Changed {
+		result = append(result, fmt.Sprintf("--dry-run=%t", f.dryRun))
+	}
 	if flags.Lookup("env-file").Changed {
 		result = append(result, "--env-file", f.envFile)
 	}
@@ -54,10 +67,16 @@ func (f *Flags) Reconstituted(flags *pflag.FlagSet) (result []string) {
 			result = append(result, "--file", file)
 		}
 	}
+	if flags.Lookup("parallel").Changed {
+		result = append(result, "--parallel", strconv.Itoa(f.parallel))
+	}
 	if flags.Lookup("profile").Changed {
 		for _, profile := range f.profiles {
 			result = append(result, "--profile", profile)
 		}
+	}
+	if flags.Lookup("progress").Changed {
+		result = append(result, "--progress", f.progress)
 	}
 	if flags.Lookup("project-directory").Changed {
 		result = append(result, "--project-directory", f.projectDirectory)

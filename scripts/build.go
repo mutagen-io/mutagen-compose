@@ -16,6 +16,8 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/mutagen-io/mutagen/cmd"
+
 	"github.com/mutagen-io/mutagen-compose/pkg/version"
 )
 
@@ -37,6 +39,10 @@ const (
 	// composeBaseName is the name of the Mutagen Compose binary without any
 	// path or extension.
 	composeBaseName = "mutagen-compose"
+
+	// minimumMacOSVersion is the minimum version of macOS that we'll support
+	// (currently pinned to the oldest version of macOS that Go supports).
+	minimumMacOSVersion = "10.13"
 
 	// minimumARMSupport is the value to pass to the GOARM environment variable
 	// when building binaries. We currently specify support for ARMv5. This will
@@ -98,8 +104,36 @@ func (t Target) appendGoEnv(environment []string) []string {
 	environment = append(environment, fmt.Sprintf("GOOS=%s", t.GOOS))
 	environment = append(environment, fmt.Sprintf("GOARCH=%s", t.GOARCH))
 
-	// Disable cgo.
-	environment = append(environment, "CGO_ENABLED=0")
+	// If we're building a macOS binary on macOS, then we enable cgo because
+	// we'll need it to access the FSEvents API (currently only required by the
+	// the underlying Docker Compose implementation and not by Mutagen Compose).
+	// We have to enable it explicitly because Go won't enable it when cross
+	// compiling between different Darwin architectures. We also need to tell
+	// the C compiler and external linker to support older versions of macOS.
+	// These flags will tell the C compiler to generate code compatible with the
+	// target version of macOS and tell the external linker what value to embed
+	// for the LC_VERSION_MIN_MACOSX flag in the resulting Mach-O binaries. Go's
+	// internal linker automatically defaults to a relatively liberal (old)
+	// value for this flag, but since we're using an external linker, it
+	// defaults to the current SDK version.
+	//
+	// For all other platforms, we disable cgo. This is essential for our Linux
+	// CI setup, because we build agent executables during testing that we then
+	// run inside Docker containers for our integration tests. These containers
+	// typically run Alpine Linux, and if the agent binary is linked to C
+	// libraries that only exist on the build system, then they won't work
+	// inside the container. We can't disable cgo on a global basis though,
+	// because it's needed for race condition testing. Another reason that it's
+	// good to disable cgo when building agent binaries during testing is that
+	// the release agent binaries will also have cgo disabled (except on macOS),
+	// and we'll want to faithfully recreate that.
+	if t.GOOS == "darwin" && runtime.GOOS == "darwin" {
+		environment = append(environment, "CGO_ENABLED=1")
+		environment = append(environment, fmt.Sprintf("CGO_CFLAGS=-mmacosx-version-min=%s", minimumMacOSVersion))
+		environment = append(environment, fmt.Sprintf("CGO_LDFLAGS=-mmacosx-version-min=%s", minimumMacOSVersion))
+	} else {
+		environment = append(environment, "CGO_ENABLED=0")
+	}
 
 	// Set up ARM target support. See notes for definition of minimumARMSupport.
 	// We don't need to unset any existing GOARM variables since they simply
@@ -401,6 +435,19 @@ func build() error {
 	}
 	if !(mode == "local" || mode == "slim" || mode == "release") {
 		return fmt.Errorf("invalid build mode: %s", mode)
+	}
+
+	// The only platform really suited to cross-compiling for every other
+	// platform at the moment is macOS. This is because FSEvents is used (by
+	// Docker Compose) for file monitoring and that is a C-based API, not
+	// accessible purely via system calls. All of the other platforms can
+	// operate with pure Go compilation.
+	if runtime.GOOS != "darwin" {
+		if mode == "release" {
+			return errors.New("macOS is required for release builds")
+		} else if mode == "slim" {
+			cmd.Warning("macOS agents will be built without cgo support")
+		}
 	}
 
 	// If a macOS code signing identity has been specified, then make sure we're

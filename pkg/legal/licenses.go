@@ -25,8 +25,8 @@ later in this text or online at https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
-Go, the Go standard library, the Go crypto, net, oauth2, sync, sys, term, text,
-and time subrepositories, modified code from the Go standard library, and
+Go, the Go standard library, the Go crypto, exp, net, oauth2, sync, sys, term,
+text, and time subrepositories, modified code from the Go standard library, and
 modified code from the build, sys, and exp subrepositories.
 
 https://golang.org/
@@ -105,9 +105,7 @@ Cobra
 
 https://github.com/spf13/cobra
 
-Copyright 2013 Steve Francia <spf@spf13.com>
-Copyright 2015 Red Hat Inc. All rights reserved.
-Copyright 2016 French Ben. All rights reserved.
+Copyright 2013-2023 The Cobra Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -151,6 +149,20 @@ https://github.com/hashicorp/errwrap
 Copyright (c) 2014 HashiCorp, Inc.
 
 A copy of the errwrap source code can be obtained at the above URL.
+
+Used under the terms of the Mozilla Public License, Version 2.0. A copy of this
+license can be found later in this text or online at
+http://mozilla.org/MPL/2.0/.
+
+--------------------------------------------------------------------------------
+
+go-cleanhttp
+
+https://github.com/hashicorp/go-cleanhttp
+
+Copyright (c) HashiCorp, Inc.
+
+A copy of the go-cleanhttp source code can be obtained at the above URL.
 
 Used under the terms of the Mozilla Public License, Version 2.0. A copy of this
 license can be found later in this text or online at
@@ -617,23 +629,13 @@ These portions are used under the terms of the 3-Clause BSD License (Google
 version). A copy of this license can be found later in this text and a templated
 version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright (c) 2015, Google Inc.
-Copyright 2018 Google LLC.
-
-These portions are used under the terms of the Apache License, Version 2.0. A
-copy of this license can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
 --------------------------------------------------------------------------------
 
 gnostic
 
-https://github.com/googleapis/gnostic
+https://github.com/google/gnostic
 
-Copyright 2017-2020, Google LLC.
+Copyright 2017-2021, Google LLC.
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -792,6 +794,17 @@ later in this text or online at https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
+hcsshim
+
+https://github.com/Microsoft/hcsshim
+
+Copyright (c) 2015 Microsoft
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
 go-ansiterm
 
 https://github.com/Azure/go-ansiterm
@@ -810,6 +823,21 @@ https://github.com/fsnotify/fsevents
 Forked and modified at https://github.com/mutagen-io/fsevents.
 
 Copyright (c) 2014 The fsevents Authors. All rights reserved.
+
+Used under the terms of the 3-Clause BSD License (Google version). A copy of
+this license can be found later in this text and a templated version can be
+found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+fsnotify
+
+https://github.com/fsnotify/fsnotify
+
+Forked and modified at https://github.com/tilt-dev/fsnotify.
+
+Copyright (c) 2012 The Go Authors. All rights reserved.
+Copyright (c) 2012-2019 fsnotify Authors. All rights reserved.
 
 Used under the terms of the 3-Clause BSD License (Google version). A copy of
 this license can be found later in this text and a templated version can be
@@ -973,6 +1001,7 @@ http://www.apache.org/licenses/LICENSE-2.0.
 Portions of this package are derived from sources with the following copyright
 statements:
 
+Copyright (c) 2009 The Go Authors. All rights reserved.
 Copyright 2020 The Go Authors. All rights reserved.
 
 These portions are used under the terms of the 3-Clause BSD License (Google
@@ -1057,6 +1086,30 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
+aws-sdk-go-v2
+
+https://github.com/aws/aws-sdk-go-v2
+
+AWS SDK for Go
+Copyright 2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2014-2015 Stripe, Inc.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
 buildx
 
 https://github.com/docker/buildx
@@ -1115,6 +1168,7 @@ Docker Compose
 https://github.com/docker/compose
 
 Copyright 2020 Docker Compose CLI authors
+Copyright 2018 The Tilt Dev Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1125,35 +1179,26 @@ Copyright 2020 Docker Compose authors
 
 This product includes software developed at Docker, Inc. (https://www.docker.com).
 
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2014 Adrian-George Bostan <adrg@epistack.com>
+
+These portions are used under the terms of the MIT License. A copy of this
+license can be found later in this text or online at
+https://opensource.org/licenses/MIT.
+
 --------------------------------------------------------------------------------
 
-Distribution
+Distribution reference
 
-https://github.com/distribution/distribution
+https://github.com/distribution/reference
 
 Copyright Distribution contributors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
 http://www.apache.org/licenses/LICENSE-2.0.
-
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright The containerd Authors.
-
-Used under the terms of the Apache License, Version 2.0. A copy of this license
-can be found later in this text or online at
-http://www.apache.org/licenses/LICENSE-2.0.
-
-Portions of this package are derived from sources with the following copyright
-statements:
-
-Copyright (c) 2013 Damien Le Berrigaud and Nick Wade
-
-These portions are used under the terms of the MIT License. A copy of this
-license can be found later in this text or online at
-https://opensource.org/licenses/MIT.
 
 --------------------------------------------------------------------------------
 
@@ -1369,9 +1414,9 @@ http://www.apache.org/licenses/LICENSE-2.0.
 
 --------------------------------------------------------------------------------
 
-ttrpc
+continuity
 
-https://github.com/containerd/ttrpc
+https://github.com/containerd/log
 
 Copyright The containerd Authors.
 
@@ -1479,6 +1524,45 @@ version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
 --------------------------------------------------------------------------------
 
+kube-openapi
+
+https://github.com/kubernetes/kube-openapi
+
+Copyright 2016 The Kubernetes Authors.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2020 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (C) MongoDB, Inc. 2017-present.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright 2015 go-swagger maintainers
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
 utils
 
 https://github.com/kubernetes/utils
@@ -1506,6 +1590,27 @@ Copyright 2013 Google Inc.
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
 http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+sigs.k8s.io/json
+
+https://github.com/kubernetes-sigs/json
+
+Copyright 2021 The Kubernetes Authors.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright 2009 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
 --------------------------------------------------------------------------------
 
@@ -1695,6 +1800,7 @@ Prometheus common components and libraries
 https://github.com/prometheus/common
 
 Copyright 2015 The Prometheus Authors
+Copyright 2020 The Prometheus-operator Authors
 
 Used under the terms of the Apache License, Version 2.0. A copy of this license
 can be found later in this text or online at
@@ -1837,7 +1943,7 @@ compress
 https://github.com/klauspost/compress
 
 Copyright (c) 2009-2016 The Go Authors. All rights reserved.
-Copyright (c) 2015-2019 Klaus Post. All rights reserved.
+Copyright (c) 2015-2023 Klaus Post. All rights reserved.
 Copyright 2011 The Snappy-Go Authors. All rights reserved.
 Based on work Copyright (c) 2013, Yann Collet, released under BSD License.
 Based on work by Yann Collet, released under BSD License.
@@ -1919,6 +2025,196 @@ Copyright (c) 2016 Sung-jin Hong
 
 Used under the terms of the MIT License. A copy of this license can be found
 later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+SemVer
+
+https://github.com/masterminds/semver
+
+Copyright (C) 2014-2019, Matt Butcher and Matt Farina
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+gojsonpointer
+
+https://github.com/go-openapi/jsonpointer
+
+Copyright 2013 sigu-399 ( https://github.com/sigu-399 )
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+gojsonreference
+
+https://github.com/go-openapi/jsonreference
+
+Copyright 2013 sigu-399 ( https://github.com/sigu-399 )
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+Swag
+
+https://github.com/go-openapi/swag
+
+Copyright 2015 go-swagger maintainers
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+clockwork
+
+https://github.com/jonboulle/clockwork
+
+Copyright The clockwork Authors
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------------------
+
+in-toto-golang
+
+https://github.com/in-toto/in-toto-golang
+
+Copyright 2018 New York University
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright 2010 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+go-pathspec
+
+https://github.com/xanzy/go-pathspec
+
+Forked and modified at https://github.com/shibumi/go-pathspec.
+
+Copyright 2014, Sander van Harmelen
+Copyright 2020, Christian Rebischke
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2012 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+smithy-go
+
+https://github.com/aws/smithy-go
+
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Used under the terms of the Apache License, Version 2.0. A copy of this license
+can be found later in this text or online at
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+go-restful
+
+https://github.com/emicklei/go-restful
+
+Copyright (c) 2012,2013 Ernest Micklei
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+intern
+
+https://github.com/josharian/intern
+
+Copyright (c) 2019 Josh Bleecher Snyder
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+go-securesystemslib
+
+https://github.com/secure-systems-lab/go-securesystemslib
+
+Copyright (c) 2021 NYU Secure Systems Lab
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+--------------------------------------------------------------------------------
+
+goautoneg
+
+https://github.com/munnerz/goautoneg
+
+Copyright (c) 2011, Open Knowledge Foundation Ltd.
+
+Used under the terms of the 3-Clause BSD License (Open Knowledge Foundation Ltd.
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
+
+--------------------------------------------------------------------------------
+
+easyjson
+
+https://github.com/mailru/easyjson
+
+Copyright (c) 2016 Mail.Ru Group
+
+Used under the terms of the MIT License. A copy of this license can be found
+later in this text or online at https://opensource.org/licenses/MIT.
+
+Portions of this package are derived from sources with the following copyright
+statements:
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+These portions are used under the terms of the 3-Clause BSD License (Google
+version). A copy of this license can be found later in this text and a templated
+version can be found online at https://opensource.org/licenses/BSD-3-Clause.
 
 --------------------------------------------------------------------------------
 
