@@ -5,7 +5,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
-	"github.com/mutagen-io/mutagen/pkg/synchronization/core"
+	"github.com/mutagen-io/mutagen/pkg/synchronization/core/ignore"
 )
 
 // boolToIgnoreVCSModeHookFunc returns a mapstructure.DecodeHookFunc that will
@@ -27,15 +27,15 @@ func boolToIgnoreVCSModeHookFunc() mapstructure.DecodeHookFuncType {
 		}
 
 		// If the storage isn't an IgnoreVCSMode, then we're done.
-		if storageType != reflect.TypeOf(core.IgnoreVCSMode_IgnoreVCSModeDefault) {
+		if storageType != reflect.TypeOf(ignore.IgnoreVCSMode_IgnoreVCSModeDefault) {
 			return data, nil
 		}
 
 		// Otherwise, perform conversion.
 		if data.(bool) {
-			return core.IgnoreVCSMode_IgnoreVCSModeIgnore, nil
+			return ignore.IgnoreVCSMode_IgnoreVCSModeIgnore, nil
 		} else {
-			return core.IgnoreVCSMode_IgnoreVCSModePropagate, nil
+			return ignore.IgnoreVCSMode_IgnoreVCSModePropagate, nil
 		}
 	}
 }
