@@ -15,18 +15,6 @@ This executable contains Mutagen enhancements licensed under the terms of the
 Server Side Public License, version 1, as published by MongoDB, Inc. A copy of
 this license can be found later in this text or online at
 http://www.mongodb.com/licensing/server-side-public-license.
-
---------------------------------------------------------------------------------
-
-jwt-go
-
-https://github.com/golang-jwt/jwt
-
-Copyright (c) 2012 Dave Grijalva
-Copyright (c) 2021 golang-jwt maintainers
-
-Used under the terms of the MIT License. A copy of this license can be found
-later in this text or online at https://opensource.org/licenses/MIT.
 `
 
 // licenseTextSSPL is the Server Side Public License content to include in the
