@@ -576,6 +576,7 @@ Go support for Protocol Buffers
 https://github.com/protocolbuffers/protobuf-go
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
+Copyright 2023 Google Inc. All rights reserved.
 
 Used under the terms of the 3-Clause BSD License (Google version). A copy of
 this license can be found later in this text and a templated version can be
@@ -753,6 +754,7 @@ uuid
 https://github.com/google/uuid
 
 Copyright (c) 2009,2014 Google Inc. All rights reserved.
+Copyright 2023 Google Inc. All rights reserved.
 
 Used under the terms of the 3-Clause BSD License (Google version). A copy of
 this license can be found later in this text and a templated version can be
@@ -1944,6 +1946,7 @@ https://github.com/klauspost/compress
 
 Copyright (c) 2009-2016 The Go Authors. All rights reserved.
 Copyright (c) 2015-2023 Klaus Post. All rights reserved.
+Copyright (c) 2024+ Klaus Post. All rights reserved.
 Copyright 2011 The Snappy-Go Authors. All rights reserved.
 Based on work Copyright (c) 2013, Yann Collet, released under BSD License.
 Based on work by Yann Collet, released under BSD License.
