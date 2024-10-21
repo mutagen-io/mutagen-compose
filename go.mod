@@ -1,6 +1,6 @@
 module github.com/mutagen-io/mutagen-compose
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/compose-spec/compose-go v1.20.2
