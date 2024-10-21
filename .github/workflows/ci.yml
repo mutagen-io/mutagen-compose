@@ -12,7 +12,7 @@ jobs:
     if: github.event_name == 'pull_request'
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: "Perform commit verification"
@@ -25,13 +25,13 @@ jobs:
           scripts/ci/verify_commits.sh
   macos:
     name: macOS
-    runs-on: macos-12
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.22.2'
+          go-version: '1.23.2'
       - name: "Install sha256sum"
         run: brew install coreutils
       - run: scripts/ci/setup_go.sh
@@ -49,17 +49,17 @@ jobs:
           MACOS_NOTARIZE_APP_SPECIFIC_PASSWORD: ${{ secrets.MACOS_NOTARIZE_APP_SPECIFIC_PASSWORD }}
           MACOS_NOTARIZE_TEAM_ID: ${{ secrets.MACOS_NOTARIZE_TEAM_ID }}
       - run: scripts/ci/sha256sum.sh
-      - uses: crazy-max/ghaction-import-gpg@v3
+      - uses: crazy-max/ghaction-import-gpg@v6
         id: import_gpg
         if: github.ref_type == 'tag'
         with:
-          gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
           passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
       - run: scripts/ci/sha256sign.sh
         if: github.ref_type == 'tag'
         env:
           SHA256_GPG_SIGNING_IDENTITY: ${{ steps.import_gpg.outputs.email }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: bundles
           path: build/release/*
@@ -69,10 +69,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.22.2'
+          go-version: '1.23.2'
       - run: scripts/ci/setup_go.sh
       - run: scripts/ci/analyze.sh
       - run: scripts/ci/test.sh
@@ -82,10 +82,10 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.22.2'
+          go-version: '1.23.2'
       - run: scripts/ci/setup_go.sh
         shell: bash
       - run: scripts/ci/analyze.sh
@@ -101,11 +101,11 @@ jobs:
     needs: [macos, linux, windows]
     timeout-minutes: 10
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           name: bundles
           path: bundles
-      - uses: alexellis/upload-assets@0.2.3
+      - uses: alexellis/upload-assets@0.4.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
