@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	moby "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -311,7 +312,7 @@ func (s *composeService) Ps(ctx context.Context, projectName string, options api
 		return nil, fmt.Errorf("unable to query Mutagen sidecar container: %w", err)
 	} else if len(containers) > 1 {
 		return nil, errors.New("multiple Mutagen sidecar containers identified")
-	} else if len(containers) == 1 {
+	} else if len(containers) == 1 && os.Getenv("MUTAGEN_COMPOSE_DISABLE_SESSION_LISTING") != "1" {
 		if err := s.liaison.listSessions(ctx, containers[0].ID); err != nil {
 			return nil, err
 		}
